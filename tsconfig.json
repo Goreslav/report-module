@@ -1,8 +1,37 @@
 {
-  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "#app": ["node_modules/@nuxt/schema/dist/types/app.d.ts"],
+      "#imports": ["types/imports.d.ts"],
+      "~": ["."],
+      "~/*": ["./*"],
+      "@": ["."],
+      "@/*": ["./*"]
+    },
+    "types": ["node", "@nuxt/types"]
+  },
+  "include": [
+    "src/**/*",
+    "playground/**/*",
+    "types/**/*"
+  ],
   "exclude": [
-    "dist",
     "node_modules",
-    "playground",
+    "dist",
+    ".output",
+    ".nuxt"
   ]
 }
