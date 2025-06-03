@@ -4,16 +4,23 @@ export default defineBuildConfig({
   entries: [
     'src/module'
   ],
-  declaration: true,
+  declaration: false,
   clean: true,
   externals: [
     '@nuxt/kit',
     '@nuxt/schema',
-    'nuxt'
+    'nuxt',
+    'vue',
+    '#app',
+    '#imports',
+    'jiti'
   ],
   rollup: {
     emitCJS: true,
-    inlineDependencies: true
+    inlineDependencies: false,
+    esbuild: {
+      target: 'node18'
+    }
   },
   failOnWarn: false
 })
