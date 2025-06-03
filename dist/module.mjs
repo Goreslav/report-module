@@ -1,12 +1,39 @@
-import jiti from "file:///Users/lubo/workSpace/pomoc/report-module/node_modules/.pnpm/jiti@1.21.7/node_modules/jiti/lib/index.js";
-
-/** @type {import("/Users/lubo/workSpace/pomoc/report-module/src/module")} */
-const _module = jiti(null, {
-  "esmResolve": true,
-  "interopDefault": true,
-  "alias": {
-    "@goreslav/report-module": "/Users/lubo/workSpace/pomoc/report-module"
-  }
-})("/Users/lubo/workSpace/pomoc/report-module/src/module.ts");
-
-export default _module;
+import { defineNuxtModule, createResolver, addImports, addComponent } from '@nuxt/kit';
+export default defineNuxtModule({
+    meta: {
+        name: 'report-module',
+        configKey: 'reportModule',
+        compatibility: {
+            nuxt: '^3.0.0'
+        }
+    },
+    defaults: {
+        apiUrl: '/api',
+        debug: false
+    },
+    setup(options, nuxt) {
+        const resolver = createResolver(import.meta.url);
+        // Pridáme konfiguráciu do runtime config
+        nuxt.options.runtimeConfig.public.reportModule = options;
+        // Registrácia komponentov
+        addComponent({
+            name: 'ModalContent',
+            filePath: resolver.resolve('./runtime/components/ModalContent.vue')
+        });
+        addComponent({
+            name: 'ReportModal',
+            filePath: resolver.resolve('./runtime/components/ReportModal.vue')
+        });
+        // Registrácia composables
+        addImports([
+            {
+                name: 'useReportModal',
+                as: 'useReportModal',
+                from: resolver.resolve('./runtime/composables/useReportModal')
+            }
+        ]);
+        if (options.debug) {
+            console.log('Report Module Options:', options);
+        }
+    }
+});

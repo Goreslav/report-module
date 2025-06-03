@@ -3,20 +3,13 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "strict": false,
     "noEmitOnError": false,
-    "declaration": false,
-    "outDir": "dist",
-    "allowJs": true
+    "declaration": true,
+    "outDir": "dist"
   },
-  "include": [
-    "src/module.ts"
-  ],
-  "exclude": [
-    "src/runtime",
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/module.ts"],
+  "exclude": ["node_modules", "dist", "playground"]
 }

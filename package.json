@@ -1,7 +1,7 @@
 {
-  "name": "@goreslav/report-module",
+  "name": "@ovb/report-module",
   "version": "1.0.0",
-  "description": "A powerful Nuxt 3 module for creating ticket reporting modals with ease",
+  "description": "A Nuxt 3 module for creating ticket reporting modals",
   "repository": {
     "type": "git",
     "url": "https://github.com/Goreslav/report-module.git"
@@ -14,13 +14,13 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types.d.ts",
+      "types": "./dist/module.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
     }
   },
   "main": "./dist/module.cjs",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/module.d.ts",
   "files": [
     "dist"
   ],
@@ -35,19 +35,13 @@
     "feedback",
     "vue"
   ],
-  "author": "Goreslav",
+  "author": "ovb",
   "scripts": {
-    "build": "tsc && cp -r src/runtime dist/ && node -e \"const fs=require('fs'); const content=fs.readFileSync('dist/module.js','utf8').replace(/export default/,'module.exports =').replace(/import\\s+{([^}]+)}\\s+from\\s+['\\\"']([^'\\\"']+)['\\\"']/g,'const {$1} = require(\\\"$2\\\")'); fs.writeFileSync('dist/module.cjs', content);\"",
-    "build:unbuild": "unbuild",
-    "dev": "nuxi dev playground",
-    "dev:build": "nuxi build playground",
-    "dev:prepare": "unbuild --stub && nuxi prepare playground",
-    "release": "npm run build && changelogen --release && npm publish && git push --follow-tags",
-    "lint": "eslint .",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "prepare": "npm run dev:prepare",
-    "prepublishOnly": "pnpm run build"
+    "build": "pnpm run clean && pnpm run build:tsc && pnpm run build:copy && pnpm run build:cjs",
+    "clean": "rm -rf dist",
+    "build:tsc": "tsc",
+    "build:copy": "cp -r src/runtime dist/ && cp dist/module.js dist/module.mjs",
+    "build:cjs": "node scripts/create-cjs.js"
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.0",
