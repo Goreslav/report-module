@@ -1,19 +1,50 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, addImports, addComponent } from '@nuxt/kit'
 
-// Module options TypeScript interface definition
-export interface ModuleOptions {}
+export interface ReportModuleOptions {
+  apiUrl?: string
+  debug?: boolean
+}
 
-export default defineNuxtModule<ModuleOptions>({
+export default defineNuxtModule<ReportModuleOptions>({
   meta: {
-    name: 'my-module',
-    configKey: 'myModule',
+    name: 'report-module',
+    configKey: 'reportModule',
+    compatibility: {
+      nuxt: '^3.0.0'
+    }
   },
-  // Default configuration options of the Nuxt module
-  defaults: {},
-  setup(_options, _nuxt) {
+  defaults: {
+    apiUrl: '/api',
+    debug: false
+  },
+  setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve('./runtime/plugin'))
-  },
+    // Pridáme konfiguráciu do runtime config
+    nuxt.options.runtimeConfig.public.reportModule = options
+
+    // Registrácia komponentov
+    addComponent({
+      name: 'ModalContent',
+      filePath: resolver.resolve('./runtime/components/ModalContent.vue')
+    })
+
+    addComponent({
+      name: 'ReportModal',
+      filePath: resolver.resolve('./runtime/components/ReportModal.vue')
+    })
+
+    // Registrácia composables
+    addImports([
+      {
+        name: 'useReportModal',
+        as: 'useReportModal',
+        from: resolver.resolve('./runtime/composables/useReportModal')
+      }
+    ])
+
+    if (options.debug) {
+      console.log('Report Module Options:', options)
+    }
+  }
 })

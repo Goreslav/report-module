@@ -1,54 +1,52 @@
 {
-  "name": "my-module",
+  "name": "report-module",
   "version": "1.0.0",
-  "description": "My new Nuxt module",
-  "repository": "your-org/my-module",
+  "description": "Nuxt module for ticket reporting system",
+  "repository": "your-username/report-module",
   "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types.d.mts",
-      "import": "./dist/module.mjs"
+      "types": "./dist/types.d.ts",
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
     }
   },
-  "main": "./dist/module.mjs",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/types.d.mts"
-      ]
-    }
-  },
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "prepack": "nuxt-module-build build",
+    "build": "unbuild",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "dev:prepare": "unbuild --stub && nuxi prepare playground",
+    "release": "npm run build && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
+    "prepare": "npm run dev:prepare"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.17.4"
+    "@nuxt/kit": "^3.8.0"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^2.4.1",
-    "@nuxt/eslint-config": "^1.4.1",
-    "@nuxt/module-builder": "^1.0.1",
-    "@nuxt/schema": "^3.17.4",
-    "@nuxt/test-utils": "^3.19.1",
-    "@types/node": "latest",
-    "changelogen": "^0.6.1",
-    "eslint": "^9.27.0",
-    "nuxt": "^3.17.4",
-    "typescript": "~5.8.3",
-    "vitest": "^3.1.4",
-    "vue-tsc": "^2.2.10"
+    "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^0.2.0",
+    "@nuxt/module-builder": "^0.5.0",
+    "@nuxt/schema": "^3.8.0",
+    "@nuxt/test-utils": "^3.8.0",
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "changelogen": "^0.5.5",
+    "eslint": "^8.54.0",
+    "nuxt": "^3.8.0",
+    "unbuild": "^2.0.0",
+    "vitest": "^0.34.6",
+    "vue": "latest",
+    "tailwindcss": "^3.3.0"
   },
-  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
+  "peerDependencies": {
+    "tailwindcss": "^3.0.0"
+  }
 }
