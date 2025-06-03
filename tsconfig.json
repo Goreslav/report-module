@@ -1,37 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "strict": true,
-    "jsx": "preserve",
+    "strict": false,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "#app": ["node_modules/@nuxt/schema/dist/types/app.d.ts"],
-      "#imports": ["types/imports.d.ts"],
-      "~": ["."],
-      "~/*": ["./*"],
-      "@": ["."],
-      "@/*": ["./*"]
-    },
-    "types": ["node", "@nuxt/types"]
+    "noEmitOnError": false,
+    "declaration": false,
+    "outDir": "dist",
+    "allowJs": true
   },
   "include": [
-    "src/**/*",
-    "playground/**/*",
-    "types/**/*"
+    "src/module.ts"
   ],
   "exclude": [
+    "src/runtime",
     "node_modules",
-    "dist",
-    ".output",
-    ".nuxt"
+    "dist"
   ]
 }

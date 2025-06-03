@@ -37,7 +37,8 @@
   ],
   "author": "Goreslav",
   "scripts": {
-    "build": "unbuild",
+    "build": "tsc && cp -r src/runtime dist/ && node -e \"const fs=require('fs'); const content=fs.readFileSync('dist/module.js','utf8').replace(/export default/,'module.exports =').replace(/import\\s+{([^}]+)}\\s+from\\s+['\\\"']([^'\\\"']+)['\\\"']/g,'const {$1} = require(\\\"$2\\\")'); fs.writeFileSync('dist/module.cjs', content);\"",
+    "build:unbuild": "unbuild",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "unbuild --stub && nuxi prepare playground",
@@ -62,9 +63,10 @@
     "changelogen": "^0.5.5",
     "eslint": "^8.54.0",
     "nuxt": "^3.8.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.8.3",
     "vitest": "^0.34.6",
-    "vue": "latest",
-    "tailwindcss": "^3.3.0"
+    "vue": "latest"
   },
   "peerDependencies": {
     "tailwindcss": "^3.0.0"
