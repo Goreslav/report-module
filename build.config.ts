@@ -7,6 +7,13 @@ export default defineBuildConfig({
   declaration: true,
   clean: true,
   externals: [
-    '@nuxt/kit'
-  ]
+    '@nuxt/kit',
+    '@nuxt/schema',
+    'nuxt'
+  ],
+  rollup: {
+    emitCJS: true,
+    inlineDependencies: true
+  },
+  failOnWarn: false
 })

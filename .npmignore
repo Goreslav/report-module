@@ -1,0 +1,35 @@
+# Development files
+playground/
+.nuxt/
+node_modules/
+.git/
+.github/
+
+# Config files
+.eslintrc*
+.gitignore
+.editorconfig
+vitest.config.*
+tsconfig.json
+
+# Documentation
+CHANGELOG.md
+*.md
+!README.md
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Build source (keep only dist)
+src/
+build.config.ts
+
+# Other
+.DS_Store
+Thumbs.db
+*.log
+.env*
