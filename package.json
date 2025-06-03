@@ -1,5 +1,5 @@
 {
-  "name": "@ovb/report-module",
+  "name": "@goreslav/report-module",
   "version": "1.0.0",
   "description": "A Nuxt 3 module for creating ticket reporting modals",
   "repository": {
@@ -35,7 +35,7 @@
     "feedback",
     "vue"
   ],
-  "author": "ovb",
+  "author": "goreslav",
   "scripts": {
     "build": "pnpm run clean && pnpm run build:tsc && pnpm run build:copy && pnpm run build:cjs",
     "clean": "rm -rf dist",
