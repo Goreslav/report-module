@@ -1,10 +1,10 @@
 import { ref, createApp, h } from 'vue'
 import ReportModal from "../components/ReportModal.vue"
 import { useRuntimeConfig } from '#app'
-import type { User } from '../types'
+import { useCaptureUtils } from './useCaptureUtils'
 
 // Globálny state pre current user
-const currentUser = ref<User | null>(null)
+const currentUser = ref(null)
 
 export const useReportModal = () => {
   const config = useRuntimeConfig().public.reportModule
@@ -12,13 +12,42 @@ export const useReportModal = () => {
   /**
    * Nastaví user objekt pre reporting
    */
-  const setUser = (user: User) => {
-    currentUser.value = user
+  const setUser = (user) => {
+    // Validácia user objektu
+    if (!user || typeof user !== 'object') {
+      console.warn('⚠️ Report Module: Invalid user object')
+      return
+    }
+
+    // Validácia povinných polí
+    if (!user.meno || typeof user.meno !== 'string') {
+      console.warn('⚠️ Report Module: user.meno (string) is required')
+      return
+    }
+
+    if (!user.ma || typeof user.ma !== 'number') {
+      console.warn('⚠️ Report Module: user.ma (number) is required')
+      return
+    }
+
+    if (!user.level || typeof user.level !== 'string') {
+      console.warn('⚠️ Report Module: user.level (string) is required')
+      return
+    }
+
+    currentUser.value = {
+      meno: user.meno,
+      ma: user.ma,
+      level: user.level,
+      // Dodatočné fields ak existujú
+      ...user
+    }
+
     if (config.debug) {
       console.log('👤 Report Module User set:', {
-        id: user.id,
-        name: user.name,
-        email: user.email
+        meno: user.meno,
+        ma: user.ma,
+        level: user.level
       })
     }
   }
@@ -26,57 +55,116 @@ export const useReportModal = () => {
   /**
    * Získa aktuálneho usera
    */
-  const getUser = (): User | null => {
+  const getUser = () => {
     return currentUser.value
   }
 
   /**
-   * Otvorí report modal
+   * Otvorí report modal s automatickým zachytením dát
    */
-  const showModal = (userOverride?: User) => {
+  const showModal = async (userOverride) => {
     if (typeof window === 'undefined') return
 
-    // Určíme ktorého usera použiť (priorita: override > current > config default)
-    const userToUse = userOverride || currentUser.value || config.user || null
+    // Error tracking už beží, len získame utils
+    const { getCapturedData } = useCaptureUtils()
+
+    // Určíme ktorého usera použiť
+    const userToUse = userOverride || currentUser.value || null
 
     if (!userToUse) {
-      console.warn('⚠️ Report Module: No user configured. Please call setUser() or configure default user in nuxt.config.ts')
+      console.warn('⚠️ Report Module: No user configured. Please call setUser() first')
+      return
+    }
+
+    // Validácia user objektu
+    if (!userToUse.meno || !userToUse.ma || !userToUse.level) {
+      console.warn('⚠️ Report Module: User must have meno (string), ma (number), and level (string)')
+      return
     }
 
     if (config.debug) {
       console.log('🚀 Opening Report Modal with user:', userToUse)
+      console.log('📊 Collecting captured data...')
     }
 
-    // Vytvoríme modal container
-    const container = document.createElement('div')
-    container.id = 'report-modal-container'
-    document.body.appendChild(container)
+    try {
+      // Zachyť všetky dáta (errors už sú zbierané od načítania stránky)
+      const capturedData = await getCapturedData()
 
-    // Vytvoríme Vue app s modalom
-    const app = createApp({
-      setup() {
-        const isOpen = ref(true)
-
-        const closeModal = () => {
-          isOpen.value = false
-          setTimeout(() => {
-            app.unmount()
-            if (document.body.contains(container)) {
-              document.body.removeChild(container)
-            }
-          }, 200)
-        }
-
-        // Poskytujeme user objekt do modalu
-        return () => h(ReportModal, {
-          isOpen: isOpen.value,
-          user: userToUse,
-          onClose: closeModal
-        })
+      if (config.debug) {
+        console.log('✅ Data capture completed:', capturedData)
       }
-    })
 
-    app.mount(container)
+      // Vytvor modal container
+      const container = document.createElement('div')
+      container.id = 'report-modal-container'
+      document.body.appendChild(container)
+
+      // Vytvor Vue app s modalom
+      const app = createApp({
+        setup() {
+          const isOpen = ref(true)
+
+          const closeModal = () => {
+            isOpen.value = false
+            setTimeout(() => {
+              app.unmount()
+              if (document.body.contains(container)) {
+                document.body.removeChild(container)
+              }
+            }, 200)
+          }
+
+          // Poskytni user objekt a captured data do modalu
+          return () => h(ReportModal, {
+            isOpen: isOpen.value,
+            user: userToUse,
+            capturedData: capturedData,
+            onClose: closeModal
+          })
+        }
+      })
+
+      app.mount(container)
+
+    } catch (error) {
+      console.error('❌ Failed to capture data:', error)
+
+      // Otvor modal aj bez captured data
+      const container = document.createElement('div')
+      container.id = 'report-modal-container'
+      document.body.appendChild(container)
+
+      const app = createApp({
+        setup() {
+          const isOpen = ref(true)
+
+          const closeModal = () => {
+            isOpen.value = false
+            setTimeout(() => {
+              app.unmount()
+              if (document.body.contains(container)) {
+                document.body.removeChild(container)
+              }
+            }, 200)
+          }
+
+          return () => h(ReportModal, {
+            isOpen: isOpen.value,
+            user: userToUse,
+            capturedData: {
+              url: window.location.href,
+              screenshot: null,
+              errors: [],
+              userAgent: navigator.userAgent
+            },
+            onClose: closeModal
+          })
+        }
+      })
+
+      app.mount(container)
+    }
   }
 
   /**

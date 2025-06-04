@@ -5,7 +5,7 @@
     @click="handleBackdropClick"
   >
     <div class="modal-content">
-      <ModalContent :user="user" />
+      <ModalContent :user="user" :capturedData="capturedData" />
     </div>
   </dialog>
 </template>
@@ -21,6 +21,10 @@ const props = defineProps({
   user: {
     type: Object,
     default: null
+  },
+  capturedData: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -32,7 +36,6 @@ const close = () => {
   emit('close')
 }
 
-// Zatvoríme modal ak klikneme na backdrop
 const handleBackdropClick = (event) => {
   if (event.target === dialogRef.value) {
     close()

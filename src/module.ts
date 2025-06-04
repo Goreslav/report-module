@@ -1,4 +1,4 @@
-import { defineNuxtModule, createResolver, addImports, addComponent } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, addImports, addComponent, addPlugin } from '@nuxt/kit'
 import type { ReportModuleOptions } from './runtime/types'
 
 export default defineNuxtModule<ReportModuleOptions>({
@@ -38,6 +38,9 @@ export default defineNuxtModule<ReportModuleOptions>({
       debug: options.debug || false
     }
 
+    // Registrácia error tracking pluginu
+    addPlugin(resolver.resolve('./runtime/plugins/error-tracker.client.js'))
+
     // Registrácia komponentov
     addComponent({
       name: 'ModalContent',
@@ -47,11 +50,6 @@ export default defineNuxtModule<ReportModuleOptions>({
     addComponent({
       name: 'ReportModal',
       filePath: resolver.resolve('./runtime/components/ReportModal.vue')
-    })
-
-    addComponent({
-      name: 'FileUpload',
-      filePath: resolver.resolve('./runtime/components/FileUpload.vue')
     })
 
     // Registrácia composables
