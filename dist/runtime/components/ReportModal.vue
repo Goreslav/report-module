@@ -1,12 +1,26 @@
 <template>
   <dialog
     ref="dialogRef"
-    class="fixed inset-0 w-full h-full top-0 left-0 bg-transparent rounded-none transform-none [&::backdrop]:bg-black/50 [&::backdrop]:backdrop-blur-sm sm:top-1/2 sm:left-1/2 sm:w-auto sm:h-auto sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl"
-    @click="handleBackdropClick">
+    class="
+      fixed inset-0
+      flex items-center justify-center
+
+      w-full h-full
+      p-0 m-0 border-none rounded-none
+      [&::backdrop]:bg-black/50
+    "
+    @click="handleBackdropClick"
+  >
     <div
-      class="bg-white w-full h-full m-5 rounded-none overflow-auto sm:mx-0 sm:my-0 sm:w-auto sm:h-auto sm:min-w-[500px] sm:max-w-[90vw] sm:max-h-[90vh] sm:rounded-2xl sm:shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
+      class="
+        bg-white
+        w-full max-w-[500px] max-h-[500px]
+        rounded-2xl
+        overflow-auto
+        m-4 sm:m-0
+      "
     >
-      <ModalContent :user="user" :capturedData="capturedData" />
+      <ModalContent @close="close" />
     </div>
   </dialog>
 </template>

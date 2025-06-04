@@ -1,20 +1,27 @@
 <template>
-  <div
-    v-if="isSubmitting"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-white/60"
-  >
+  <div class="relative flex flex-col">
     <div
-      class="h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent"
-      role="status"
+      v-if="isSubmitting"
+      class="
+        absolute inset-0 z-50
+        flex items-center justify-center
+        bg-white/60
+      "
     >
-      <span class="sr-only">Načítava sa...</span>
+      <div
+        class="
+          h-12 w-12 animate-spin
+          rounded-full border-4 border-solid
+          border-blue-500 border-t-transparent
+        "
+        role="status"
+      ></div>
     </div>
-  </div>
-  <div class="flex w-[540px] flex-col rounded-[20px] bg-white shadow-lg">
+
     <div class="flex flex-col gap-2.5 px-5 pt-5">
       <h1 class="text-xl font-bold tracking-tight">Žiadosť o pomoc</h1>
       <h2 class="text-md leading-5 tracking-tight text-[#8792A4]">
-        Po zadaní popisu chyby sa automaticky vytvorí ticket ktorý sa pokúsme
+        Po zadaní popisu chyby sa automaticky vytvorí ticket ktorý sa pokúsime
         vyriešiť podľa veľkosti problému v čo najskoršom čase.
       </h2>
     </div>
@@ -26,13 +33,20 @@
         </div>
         <div class="relative">
           <div
-            class="relative flex h-auto min-h-[100px] w-full items-start border border-[#D6D9E2] rounded-[10px] overflow-hidden"
+            class="
+              relative flex h-auto min-h-[100px] w-full items-start
+              border border-[#D6D9E2] rounded-[10px] overflow-hidden
+            "
             :class="[descriptionError ? 'border-red-500' : '']"
           >
             <textarea
               id="description"
               v-model="formData.text"
-              class="peer w-full h-full bg-transparent placeholder-transparent px-2 text-lg focus:outline-none focus:border-black min-h-[100px] resize-none"
+              class="
+                peer w-full h-full bg-transparent placeholder-transparent
+                px-2 text-lg focus:outline-none focus:border-black
+                min-h-[100px] resize-none
+              "
               placeholder="Popíšte čo sa stalo a aké kroky ste vykonali"
               :class="[formData.text ? 'pt-6' : '', 'focus:pt-6']"
               @blur="validateDescription"
@@ -41,7 +55,7 @@
               class="pointer-events-none absolute left-2 text-nowrap text-[#8792A4] transition-all"
               :class="[formData.text ? 'top-1 text-sm' : 'top-[18px] text-lg', 'peer-focus:top-1 peer-focus:text-sm']"
             >
-              Popis problému
+              Popíšte čo sa stalo a aké kroky ste vykonali
             </label>
           </div>
           <div v-if="descriptionError" class="text-red-500 mt-1 text-sm">
@@ -53,13 +67,23 @@
 
     <div class="border-gray mt-3 flex justify-end border-t p-3 gap-2.5">
       <button
-        class="text-[15px] tracking-tight font-semibold rounded-[8px] px-2.5 py-2 text-[#8792A4] transition-colors duration-200 hover:bg-gray-100"
+        class="
+          text-[15px] tracking-tight font-semibold rounded-[8px]
+          px-2.5 py-2 text-[#8792A4]
+          transition-colors duration-200 hover:bg-gray-100
+        "
         @click="resetForm"
       >
         Zrušiť
       </button>
       <button
-        class="rounded-[8px] tracking-tight text-[15px] bg-black px-2.5 py-2 font-semibold text-white transition-colors duration-200 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        class="
+          rounded-[8px] tracking-tight text-[15px]
+          bg-black px-2.5 py-2 font-semibold text-white
+          transition-colors duration-200
+          hover:bg-gray-600
+          disabled:bg-gray-400 disabled:cursor-not-allowed
+        "
         :disabled="isSubmitting || !isFormValid"
         @click="handleSubmit"
       >
@@ -69,8 +93,9 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRuntimeConfig } from '#app'
 import { useTicketApi } from '../composables/useTicketApi'
 
@@ -132,7 +157,6 @@ const resetToForm = () => {
 }
 
 const handleSubmit = async () => {
-  // Validate before submit
   const isDescValid = validateDescription()
 
   if (!isDescValid) {
