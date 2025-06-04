@@ -5,25 +5,7 @@
     @click="handleBackdropClick"
   >
     <div class="modal-content">
-      <ModalContent />
-      <!-- Tlačidlá -->
-      <div class="button-container">
-        <button
-          @click="handleClick"
-          class="btn btn-primary"
-          type="button"
-        >
-          Klikni na mňa
-        </button>
-
-        <button
-          @click="close"
-          class="btn btn-secondary"
-          type="button"
-        >
-          Zavrieť
-        </button>
-      </div>
+      <ModalContent :user="user" />
     </div>
   </dialog>
 </template>
@@ -34,22 +16,17 @@ import { ref, watch, nextTick } from 'vue'
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    default: false
+    required: true
   },
-  apiUrl: {
-    type: String,
-    default: ''
+  user: {
+    type: Object,
+    default: null
   }
 })
 
 const emit = defineEmits(['close'])
 
 const dialogRef = ref(null)
-
-const handleClick = () => {
-  console.log('brm')
-  console.log('API URL:', props.apiUrl)
-}
 
 const close = () => {
   emit('close')
@@ -80,58 +57,52 @@ watch(() => props.isOpen, async (newValue) => {
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
-  padding: 10px;
+  padding: 0;
   border: none;
-  border-radius: 25px;
+  border-radius: 16px;
   max-width: none;
   max-height: none;
   width: auto;
   height: auto;
+  background: transparent;
 }
 
 .dialog-custom::backdrop {
   background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
 }
 
 .modal-content {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  min-width: 400px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  min-width: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
 }
 
-.button-container {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
-}
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    min-width: 300px;
+    max-width: 95vw;
+    margin: 20px;
+  }
 
-.btn {
-  flex: 1;
-  font-weight: 500;
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
+  .dialog-custom {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform: none;
+    border-radius: 0;
+  }
 
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
+  .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
 }
 </style>
