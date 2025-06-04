@@ -108,47 +108,13 @@
       </div>
 
       <!-- File Upload -->
-      <div class="w-full">
-        <label class="mb-1 block text-sm font-medium">Prílohy</label>
-        <div
-          class="relative flex h-[145px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[10px] transition-colors border border-dashed border-[#D6D9E2] bg-[#F0F2F6]"
-          @click="triggerFileInput"
-        >
-          <div class="flex flex-col items-center justify-center">
-            <div class="h-[36px] w-[32px] text-center text-2xl">☁️</div>
-            <span class="max-w-[296px] text-center text-[#8792A4] text-[15px] tracking-tight">
-              <span class="text-black font-semibold">Nahrajte</span>
-              snímku obrazovky s problémom alebo problémové súbory
-            </span>
-          </div>
-          <input
-            ref="fileInputRef"
-            type="file"
-            multiple
-            class="hidden"
-            accept=".jpg,.jpeg,.gif,.png,.pdf"
-            @change="handleFileUpload"
-          />
-        </div>
-
-        <!-- Uploaded Files -->
-        <div v-if="uploadedFiles.length" class="mt-2">
-          <div
-            v-for="(file, idx) in uploadedFiles"
-            :key="idx"
-            class="mb-1 flex items-center justify-between rounded-md bg-gray-50 p-2"
-          >
-            <span class="max-w-[200px] truncate text-sm">{{ file.name }}</span>
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 ml-2"
-              @click="removeFile(idx)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      </div>
+      <FileUpload
+        id="fileUpload"
+        v-model="formData.fileIds"
+        label="Prílohy"
+        :max-files-count="6"
+        :max-file-size="10 * 1024 * 1024"
+      />
     </div>
 
     <!-- Form Buttons -->
@@ -173,6 +139,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRuntimeConfig } from '#app'
+import { useTicketApi } from '../composables/useTicketApi'
 
 // Reactive data
 const isSubmitting = ref(false)
@@ -180,16 +147,16 @@ const isSuccessResult = ref(false)
 const ticketNumber = ref('')
 const linkError = ref('')
 const descriptionError = ref('')
-const uploadedFiles = ref([])
-const fileInputRef = ref(null)
 
 const formData = ref({
   linkToPage: '',
-  description: ''
+  description: '',
+  fileIds: []
 })
 
 // Get config
 const config = useRuntimeConfig().public.reportModule
+const { createTicket } = useTicketApi()
 
 // Computed
 const isFormValid = computed(() => {
@@ -227,26 +194,12 @@ const validateDescription = () => {
   return true
 }
 
-const triggerFileInput = () => {
-  fileInputRef.value?.click()
-}
-
-const handleFileUpload = (event) => {
-  const files = Array.from(event.target.files || [])
-  uploadedFiles.value.push(...files)
-  event.target.value = '' // Reset input
-}
-
-const removeFile = (index) => {
-  uploadedFiles.value.splice(index, 1)
-}
-
 const resetForm = () => {
   formData.value = {
     linkToPage: '',
-    description: ''
+    description: '',
+    fileIds: []
   }
-  uploadedFiles.value = []
   linkError.value = ''
   descriptionError.value = ''
   isSuccessResult.value = false
@@ -268,20 +221,19 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   try {
-    // Simulate API call
-    console.log('Submitting ticket:', {
+    // Skutočné API volanie
+    const result = await createTicket({
       linkToPage: formData.value.linkToPage,
       description: formData.value.description,
-      files: uploadedFiles.value,
-      apiUrl: config.apiUrl
+      fileIds: formData.value.fileIds
     })
 
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Simulate success
-    ticketNumber.value = Math.floor(Math.random() * 10000).toString()
-    isSuccessResult.value = true
+    if (result.success) {
+      ticketNumber.value = result.ticketNumber.toString()
+      isSuccessResult.value = true
+    } else {
+      throw new Error('Nepodarilo sa vytvoriť ticket')
+    }
 
   } catch (error) {
     console.error('Error submitting ticket:', error)
