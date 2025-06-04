@@ -47,7 +47,7 @@ watch(() => props.isOpen, async (newValue) => {
   } else if (dialogRef.value) {
     dialogRef.value.close()
   }
-}, { immediate: true })
+}, {immediate: true})
 </script>
 
 <style scoped>

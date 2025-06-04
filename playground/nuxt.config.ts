@@ -2,7 +2,8 @@ export default defineNuxtConfig({
   modules: ['../src/module'],
 
   reportModule: {
-    apiUrl: 'http://localhost:3334',
+    apiKey: 'playground-test-key-123',
+    apiUrl: 'http://localhost:3334/api',
     debug: true
   },
 
