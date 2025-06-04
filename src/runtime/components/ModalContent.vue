@@ -29,7 +29,7 @@
     <div class="p-5">
       <div class="space-y-4">
         <div class="mb-2.5 text-md leading-[23px] tracking-tight">
-          Detail chyby
+          Popíšte čo sa stalo a aké kroky ste vykonali
         </div>
         <div class="relative">
           <div
@@ -51,12 +51,6 @@
               :class="[formData.text ? 'pt-6' : '', 'focus:pt-6']"
               @blur="validateDescription"
             ></textarea>
-            <label
-              class="pointer-events-none absolute left-2 text-nowrap text-[#8792A4] transition-all"
-              :class="[formData.text ? 'top-1 text-sm' : 'top-[18px] text-lg', 'peer-focus:top-1 peer-focus:text-sm']"
-            >
-              Popíšte čo sa stalo a aké kroky ste vykonali
-            </label>
           </div>
           <div v-if="descriptionError" class="text-red-500 mt-1 text-sm">
             {{ descriptionError }}
