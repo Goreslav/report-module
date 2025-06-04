@@ -41,7 +41,14 @@
     "clean": "rm -rf dist",
     "build:tsc": "tsc",
     "build:copy": "cp -r src/runtime dist/ && cp dist/module.js dist/module.mjs",
-    "build:cjs": "node scripts/create-cjs.js"
+    "build:cjs": "node scripts/create-cjs.js",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "unbuild --stub && nuxi prepare playground",
+    "release": "pnpm run build && changelogen --release && git push --follow-tags",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.0",

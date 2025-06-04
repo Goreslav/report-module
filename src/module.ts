@@ -34,6 +34,11 @@ export default defineNuxtModule<ReportModuleOptions>({
       filePath: resolver.resolve('./runtime/components/ReportModal.vue')
     })
 
+    addComponent({
+      name: 'FileUpload',
+      filePath: resolver.resolve('./runtime/components/FileUpload.vue')
+    })
+
     // Registrácia composables
     addImports([
       {

@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   modules: ['../src/module'],
 
   reportModule: {
-    apiUrl: 'https://api.example.com',
+    apiUrl: 'http://localhost:3334',
     debug: true
   },
 

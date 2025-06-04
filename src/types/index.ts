@@ -1,10 +1,5 @@
-export interface ReportModuleOptions {
-  apiUrl?: string
-  debug?: boolean
-}
-
 export interface TicketPayload {
-  formType: string;
+  formType?: string;
   description: string;
   linkToPage: string;
   reporterMa?: string;
@@ -27,27 +22,10 @@ export interface FileUploadResponse {
     filePath: string;
     id: number;
   };
+  message?: string;
 }
 
-export enum SelectBoxType {
-  PRODUCTION = 'production',
-  PROTOCOLS = 'protocols',
-  PORTAL_AERO = 'portal_aero',
-  MY_COMPANY = 'my_company',
-  ORANGE_EMAILS = 'orange_emails',
-  OTHER = 'other'
-}
-
-export interface BoxItem {
-  iconName: string;
-  text: string;
-  type: SelectBoxType;
-}
-
-export interface FormField {
-  id: string;
-  type: string;
-  label: string;
-  placeholder: string;
-  required: boolean;
+export interface ReportModuleOptions {
+  apiUrl?: string
+  debug?: boolean
 }
