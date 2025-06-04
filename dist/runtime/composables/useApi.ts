@@ -1,16 +1,5 @@
 import { $fetch } from 'ofetch'
 import { useRuntimeConfig, useCookie } from '#app'
-
-export async function refreshSession() {
-  try {
-    await $fetch("/api/auth/session?update", {
-      method: "POST",
-      credentials: "include",
-    });
-  } catch (error) {
-    throw error;
-  }
-}
 function getAuthToken() {
   try {
     const accessTokenCookie = useCookie('access-token')
@@ -29,15 +18,39 @@ function getAuthToken() {
   }
 }
 
+export async function refreshSession() {
+  try {
+    const refreshedToken = await $fetch("/auth/refresh", {
+      method: "GET",  // Tvoj middleware používa GET
+      credentials: "include",
+    });
+
+    console.log('✅ Session refreshed successfully')
+    return refreshedToken
+  } catch (error) {
+    console.warn('❌ Failed to refresh session:', error)
+    // Redirect na login ak refresh zlyhal
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname
+      window.location.href = `/auth/login?back=${encodeURIComponent(currentPath)}`
+    }
+    throw error;
+  }
+}
+
 export async function useApi<T>(
   url: string,
   options: any = {}
 ): Promise<{ data: { value: T }, error: { value: any } }> {
   const config = useRuntimeConfig().public.reportModule
 
+  console.log('🔧 Full config:', config)
+  console.log('🔧 config.apiUrl:', config.apiUrl)
+  console.log('🔧 typeof config.apiUrl:', typeof config.apiUrl)
+
   try {
     // KRITICKÉ: Kompletná URL - priamo na externú doménu, bez proxy!
-    const fullUrl = `${config.apiUrl}${url}`
+    const fullUrl = `${config.apiUrl || ''}${url}`
 
     console.log('🚀 Report Module API Call:', fullUrl) // Debug
 
