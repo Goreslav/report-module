@@ -19,7 +19,7 @@
         m-4 sm:m-0
       "
     >
-      <ModalContent @close="close" />
+      <ModalContent @close="close" :captured-data="capturedData" :user="user"/>
     </div>
   </dialog>
 </template>
