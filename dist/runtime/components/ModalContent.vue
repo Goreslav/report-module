@@ -21,7 +21,7 @@
     <div class="flex flex-col gap-2.5 px-5 pt-5">
       <h1 class="text-xl font-bold tracking-tight">Žiadosť o pomoc</h1>
       <h2 class="text-md leading-5 tracking-tight text-[#8792A4]">
-        Po zadaní popisu chyby sa automaticky vytvorí ticket ktorý sa pokúsime
+        Po zadaní popisu chyby sa pokúsime
         vyriešiť podľa veľkosti problému v čo najskoršom čase.
       </h2>
     </div>
