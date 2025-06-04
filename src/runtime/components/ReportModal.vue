@@ -4,8 +4,6 @@
     class="
       fixed inset-0
       flex items-center justify-center
-
-      w-full h-full
       p-0 m-0 border-none rounded-none
       [&::backdrop]:bg-black/50
     "
