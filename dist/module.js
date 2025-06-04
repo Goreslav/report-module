@@ -7,10 +7,6 @@ export default defineNuxtModule({
             nuxt: '^3.0.0'
         }
     },
-    defaults: {
-        apiUrl: '/api',
-        debug: false
-    },
     setup(options, nuxt) {
         const resolver = createResolver(import.meta.url);
         // DEBUG: Úplne všetko
