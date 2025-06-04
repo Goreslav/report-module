@@ -8,13 +8,23 @@ export default defineNuxtModule({
         }
     },
     defaults: {
-        apiUrl: '/api',
+        apiUrl: '',
         debug: false
     },
     setup(options, nuxt) {
         const resolver = createResolver(import.meta.url);
+        // KĽÚČOVÉ: Merge user options s defaults
+        const moduleOptions = {
+            apiUrl: options.apiUrl || '/api',
+            debug: options.debug || false
+        };
+        // Debug: Pozri čo dostávame
+        if (moduleOptions.debug) {
+            console.log('🔧 Module setup - received options:', options);
+            console.log('🔧 Module setup - final config:', moduleOptions);
+        }
         // Pridáme konfiguráciu do runtime config
-        nuxt.options.runtimeConfig.public.reportModule = options;
+        nuxt.options.runtimeConfig.public.reportModule = moduleOptions;
         // Registrácia komponentov
         addComponent({
             name: 'ModalContent',
