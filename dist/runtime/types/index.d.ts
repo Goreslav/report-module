@@ -1,10 +1,7 @@
 export interface User {
-    id: string | number;
+    ma: number;
     name: string;
-    email?: string;
-    role?: string;
-    department?: string;
-    [key: string]: any;
+    level: string;
 }
 export interface ReportModuleOptions {
     apiKey: string;

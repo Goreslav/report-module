@@ -1,10 +1,11 @@
 <template>
   <dialog
     ref="dialogRef"
-    class="dialog-custom"
-    @click="handleBackdropClick"
-  >
-    <div class="modal-content">
+    class="fixed inset-0 w-full h-full top-0 left-0 bg-transparent rounded-none transform-none [&::backdrop]:bg-black/50 [&::backdrop]:backdrop-blur-sm sm:top-1/2 sm:left-1/2 sm:w-auto sm:h-auto sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl"
+    @click="handleBackdropClick">
+    <div
+      class="bg-white w-full h-full m-5 rounded-none overflow-auto sm:mx-0 sm:my-0 sm:w-auto sm:h-auto sm:min-w-[500px] sm:max-w-[90vw] sm:max-h-[90vh] sm:rounded-2xl sm:shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
+    >
       <ModalContent :user="user" :capturedData="capturedData" />
     </div>
   </dialog>
@@ -42,70 +43,16 @@ const handleBackdropClick = (event) => {
   }
 }
 
-// Sledujeme zmeny isOpen a otvárame/zatvárame dialog
-watch(() => props.isOpen, async (newValue) => {
-  await nextTick()
-  if (newValue && dialogRef.value) {
-    dialogRef.value.showModal()
-  } else if (dialogRef.value) {
-    dialogRef.value.close()
-  }
-}, {immediate: true})
+watch(
+  () => props.isOpen,
+  async (newValue) => {
+    await nextTick()
+    if (newValue && dialogRef.value) {
+      dialogRef.value.showModal()
+    } else if (dialogRef.value) {
+      dialogRef.value.close()
+    }
+  },
+  { immediate: true }
+)
 </script>
-
-<style scoped>
-.dialog-custom {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 16px;
-  max-width: none;
-  max-height: none;
-  width: auto;
-  height: auto;
-  background: transparent;
-}
-
-.dialog-custom::backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-}
-
-.modal-content {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  padding: 0;
-  min-width: 500px;
-  max-width: 90vw;
-  max-height: 90vh;
-  overflow: auto;
-}
-
-/* Mobile responsive */
-@media (max-width: 640px) {
-  .modal-content {
-    min-width: 300px;
-    max-width: 95vw;
-    margin: 20px;
-  }
-
-  .dialog-custom {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    transform: none;
-    border-radius: 0;
-  }
-
-  .modal-content {
-    border-radius: 0;
-    height: 100%;
-  }
-}
-</style>

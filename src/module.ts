@@ -12,7 +12,6 @@ export default defineNuxtModule<ReportModuleOptions>({
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    // Validácia povinných options
     if (!options.apiKey) {
       throw new Error('Report Module: apiKey is required. Please configure it in nuxt.config.ts')
     }
@@ -30,7 +29,6 @@ export default defineNuxtModule<ReportModuleOptions>({
       console.log('==================================')
     }
 
-    // Pridáme konfiguráciu do runtime config
     nuxt.options.runtimeConfig.public.reportModule = {
       apiUrl: options.apiUrl,
       apiKey: options.apiKey,
@@ -38,10 +36,8 @@ export default defineNuxtModule<ReportModuleOptions>({
       debug: options.debug || false
     }
 
-    // Registrácia error tracking pluginu
     addPlugin(resolver.resolve('./runtime/plugins/error-tracker.client.js'))
 
-    // Registrácia komponentov
     addComponent({
       name: 'ModalContent',
       filePath: resolver.resolve('./runtime/components/ModalContent.vue')
@@ -52,7 +48,6 @@ export default defineNuxtModule<ReportModuleOptions>({
       filePath: resolver.resolve('./runtime/components/ReportModal.vue')
     })
 
-    // Registrácia composables
     addImports([
       {
         name: 'useReportModal',
@@ -66,6 +61,4 @@ export default defineNuxtModule<ReportModuleOptions>({
     }
   }
 })
-
-// Export types pre TypeScript support
 export type { ReportModuleOptions, User, TicketPayload, TicketResponse } from './runtime/types'

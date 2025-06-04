@@ -9,7 +9,6 @@ module.exports = defineNuxtModule({
     },
     setup(options, nuxt) {
         const resolver = createResolver(import.meta.url);
-        // Validácia povinných options
         if (!options.apiKey) {
             throw new Error('Report Module: apiKey is required. Please configure it in nuxt.config.ts');
         }
@@ -24,16 +23,13 @@ module.exports = defineNuxtModule({
             console.log('🔧 Debug Mode:', options.debug);
             console.log('==================================');
         }
-        // Pridáme konfiguráciu do runtime config
         nuxt.options.runtimeConfig.public.reportModule = {
             apiUrl: options.apiUrl,
             apiKey: options.apiKey,
             user: options.user || null,
             debug: options.debug || false
         };
-        // Registrácia error tracking pluginu
         addPlugin(resolver.resolve('./runtime/plugins/error-tracker.client.js'));
-        // Registrácia komponentov
         addComponent({
             name: 'ModalContent',
             filePath: resolver.resolve('./runtime/components/ModalContent.vue')
@@ -42,7 +38,6 @@ module.exports = defineNuxtModule({
             name: 'ReportModal',
             filePath: resolver.resolve('./runtime/components/ReportModal.vue')
         });
-        // Registrácia composables
         addImports([
             {
                 name: 'useReportModal',

@@ -16,21 +16,12 @@ export async function useApi<T>(
   }
 
   try {
-    // Validácia API key
-    if (!config.apiKey) {
-      throw new Error('API key is required for Report Module. Please configure apiKey in nuxt.config.ts')
-    }
-
-    // Kompletná URL
     const fullUrl = `${config.apiUrl || ''}${url}`
-
-    // Headers s API key
     const headers: Record<string, string> = {
       'X-API-Key': config.apiKey,
       ...options.headers,
     }
 
-    // Ak nie je FormData, pridaj Content-Type
     if (!(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json'
     }
@@ -43,8 +34,6 @@ export async function useApi<T>(
         apiKeyPreview: config.apiKey.substring(0, 8) + '...'
       })
     }
-
-    // API volanie
     const result = await $fetch<T>(fullUrl, {
       ...options,
       headers,
@@ -56,10 +45,7 @@ export async function useApi<T>(
         })
 
         if (response.status === 401) {
-          throw new Error('Invalid API key. Please check your configuration.')
-        }
-        if (response.status === 403) {
-          throw new Error('API key does not have permission for this operation.')
+          throw new Error('No permission')
         }
       },
     })
@@ -73,11 +59,6 @@ export async function useApi<T>(
       error: { value: null }
     }
   } catch (error) {
-    console.error('❌ Report Module API Call failed:', {
-      url,
-      error: error.message || error
-    })
-
     return {
       data: { value: null as any },
       error: { value: error }

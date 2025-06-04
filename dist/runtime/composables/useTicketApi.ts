@@ -2,17 +2,15 @@ import { useApi } from './useApi'
 
 export const useTicketApi = () => {
   const createTicket = async (payload, user) => {
-    // Vytvoríme kompletný ticket objekt BEZ timestampov a source
     const ticketData = {
-      text: payload.text, // Povinný text field
-      url: payload.url, // URL kde bol modal otvorený
-      screenshot: payload.screenshot, // Base64 screenshot
-      errors: payload.errors || [], // Console errors BEZ timestampov
+      text: payload.text,
+      url: payload.url,
+      screenshot: payload.screenshot,
+      errors: payload.errors || [],
       userAgent: payload.userAgent,
-      user: user // User objekt s meno, ma, level
+      user: user
     }
 
-    // JSON API volanie
     const { data, error } = await useApi("/tickets", {
       method: "POST",
       body: JSON.stringify(ticketData),
