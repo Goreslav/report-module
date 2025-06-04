@@ -8,21 +8,20 @@ export default defineNuxtModule({
         }
     },
     defaults: {
-        apiUrl: '',
+        apiUrl: '/api',
         debug: false
     },
     setup(options, nuxt) {
         const resolver = createResolver(import.meta.url);
-        // KĽÚČOVÉ: Merge user options s defaults
-        const moduleOptions = {
-            apiUrl: options.apiUrl || '/api',
-            debug: options.debug || false
-        };
-        // Debug: Pozri čo dostávame
-        if (moduleOptions.debug) {
-            console.log('🔧 Module setup - received options:', options);
-            console.log('🔧 Module setup - final config:', moduleOptions);
-        }
+        // DEBUG: Úplne všetko
+        console.log('=== MODULE SETUP DEBUG ===');
+        console.log('🔧 typeof options:', typeof options);
+        console.log('🔧 options keys:', Object.keys(options || {}));
+        console.log('🔧 Raw options:', JSON.stringify(options, null, 2));
+        console.log('===========================');
+        // Použiť priamo options (bez defaults kým nevyriešime problém)
+        const moduleOptions = options || {};
+        console.log('🔧 Using moduleOptions:', moduleOptions);
         // Pridáme konfiguráciu do runtime config
         nuxt.options.runtimeConfig.public.reportModule = moduleOptions;
         // Registrácia komponentov
