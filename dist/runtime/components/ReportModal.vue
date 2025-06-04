@@ -2,6 +2,7 @@
   <dialog
     ref="dialogRef"
     class="
+      rounded-lg
       fixed inset-0
       flex items-center justify-center
       p-0 m-0 border-none rounded-none

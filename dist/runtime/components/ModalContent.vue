@@ -148,6 +148,7 @@ const resetForm = () => {
 
 const resetToForm = () => {
   resetForm()
+  emit('close')
 }
 
 const handleSubmit = async () => {
@@ -181,8 +182,6 @@ const handleSubmit = async () => {
     const result = await createTicket(ticketPayload, user)
 
     if (result.success) {
-      console.log('✅ Ticket created successfully with number:', result.ticketNumber)
-
       emit('close')
 
     } else {
@@ -191,7 +190,9 @@ const handleSubmit = async () => {
 
   } catch (error) {
     let errorMessage = 'Nastala chyba pri odosielaní.'
-    alert(errorMessage)
+    if (config.debug) {
+      alert(errorMessage)
+    }
   } finally {
     isSubmitting.value = false
   }
