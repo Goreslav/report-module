@@ -1,42 +1,5 @@
 import { $fetch } from 'ofetch'
-import { useRuntimeConfig, useCookie } from '#app'
-function getAuthToken() {
-  try {
-    const accessTokenCookie = useCookie('access-token')
-    if (accessTokenCookie.value) {
-      // Ak je to JSON objekt s access_token property
-      const tokenData = typeof accessTokenCookie.value === 'string'
-        ? JSON.parse(accessTokenCookie.value)
-        : accessTokenCookie.value
-
-      return tokenData.access_token || tokenData
-    }
-    return null
-  } catch (error) {
-    console.warn('Could not get auth token:', error)
-    return null
-  }
-}
-
-export async function refreshSession() {
-  try {
-    const refreshedToken = await $fetch("/auth/refresh", {
-      method: "GET",  // Tvoj middleware používa GET
-      credentials: "include",
-    });
-
-    console.log('✅ Session refreshed successfully')
-    return refreshedToken
-  } catch (error) {
-    console.warn('❌ Failed to refresh session:', error)
-    // Redirect na login ak refresh zlyhal
-    if (typeof window !== 'undefined') {
-      const currentPath = window.location.pathname
-      window.location.href = `/auth/login?back=${encodeURIComponent(currentPath)}`
-    }
-    throw error;
-  }
-}
+import { useRuntimeConfig } from '#app'
 
 export async function useApi<T>(
   url: string,
@@ -44,51 +7,77 @@ export async function useApi<T>(
 ): Promise<{ data: { value: T }, error: { value: any } }> {
   const config = useRuntimeConfig().public.reportModule
 
-  console.log('🔧 Full config:', config)
-  console.log('🔧 config.apiUrl:', config.apiUrl)
-  console.log('🔧 typeof config.apiUrl:', typeof config.apiUrl)
+  if (config.debug) {
+    console.log('🔧 Report Module API Config:', {
+      apiUrl: config.apiUrl,
+      hasApiKey: !!config.apiKey,
+      url: url
+    })
+  }
 
   try {
-    // KRITICKÉ: Kompletná URL - priamo na externú doménu, bez proxy!
+    // Validácia API key
+    if (!config.apiKey) {
+      throw new Error('API key is required for Report Module. Please configure apiKey in nuxt.config.ts')
+    }
+
+    // Kompletná URL
     const fullUrl = `${config.apiUrl || ''}${url}`
 
-    console.log('🚀 Report Module API Call:', fullUrl) // Debug
-
-    // Získaj aktuálny auth token z user session
-    const authToken = getAuthToken()
-
-    // Headers pre externú doménu
+    // Headers s API key
     const headers: Record<string, string> = {
+      'X-API-Key': config.apiKey,
       ...options.headers,
     }
 
-    // Pridaj auth token ak existuje
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`
-      console.log('🔐 Using auth token:', authToken.substring(0, 10) + '...') // Debug
+    // Ak nie je FormData, pridaj Content-Type
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json'
     }
 
-    // KĽÚČOVÉ: Použiť priamo $fetch namiesto useFetch/proxy
+    if (config.debug) {
+      console.log('🚀 Report Module API Call:', {
+        url: fullUrl,
+        method: options.method || 'GET',
+        hasApiKey: !!config.apiKey,
+        apiKeyPreview: config.apiKey.substring(0, 8) + '...'
+      })
+    }
+
+    // API volanie
     const result = await $fetch<T>(fullUrl, {
       ...options,
       headers,
-      // Nepoužívame $api proxy - len čistý $fetch
-      onResponseError: async ({ response }) => {
-        console.error('❌ API Error:', response.status, response.statusText)
+      onResponseError: ({ response }) => {
+        console.error('❌ Report Module API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: fullUrl
+        })
+
         if (response.status === 401) {
-          await refreshSession();
+          throw new Error('Invalid API key. Please check your configuration.')
+        }
+        if (response.status === 403) {
+          throw new Error('API key does not have permission for this operation.')
         }
       },
     })
 
-    console.log('✅ API Success:', result) // Debug
+    if (config.debug) {
+      console.log('✅ Report Module API Success:', result)
+    }
 
     return {
       data: { value: result },
       error: { value: null }
     }
   } catch (error) {
-    console.error('❌ API Call failed:', error) // Debug
+    console.error('❌ Report Module API Call failed:', {
+      url,
+      error: error.message || error
+    })
+
     return {
       data: { value: null as any },
       error: { value: error }

@@ -1,7 +1,7 @@
 {
   "name": "@goreslav/report-module",
-  "version": "1.1.6",
-  "description": "A Nuxt 3 module for creating ticket reporting modals",
+  "version": "2.0.0",
+  "description": "A Nuxt 3 module for creating ticket reporting modals with API key authentication and user tracking",
   "repository": {
     "type": "git",
     "url": "https://github.com/Goreslav/report-module.git"
@@ -33,7 +33,10 @@
     "ticket",
     "bug-report",
     "feedback",
-    "vue"
+    "vue",
+    "api-key",
+    "user-tracking",
+    "typescript"
   ],
   "author": "goreslav",
   "scripts": {
@@ -48,7 +51,8 @@
     "release": "pnpm run build && changelogen --release && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.0",
@@ -70,6 +74,7 @@
     "vue": "latest"
   },
   "peerDependencies": {
-    "tailwindcss": "^3.0.0"
+    "nuxt": "^3.0.0",
+    "vue": "^3.0.0"
   }
 }

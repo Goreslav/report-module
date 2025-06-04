@@ -9,17 +9,28 @@ export default defineNuxtModule({
     },
     setup(options, nuxt) {
         const resolver = createResolver(import.meta.url);
-        // DEBUG: Úplne všetko
-        console.log('=== MODULE SETUP DEBUG ===');
-        console.log('🔧 typeof options:', typeof options);
-        console.log('🔧 options keys:', Object.keys(options || {}));
-        console.log('🔧 Raw options:', JSON.stringify(options, null, 2));
-        console.log('===========================');
-        // Použiť priamo options (bez defaults kým nevyriešime problém)
-        const moduleOptions = options || {};
-        console.log('🔧 Using moduleOptions:', moduleOptions);
+        // Validácia povinných options
+        if (!options.apiKey) {
+            throw new Error('Report Module: apiKey is required. Please configure it in nuxt.config.ts');
+        }
+        if (!options.apiUrl) {
+            throw new Error('Report Module: apiUrl is required. Please configure it in nuxt.config.ts');
+        }
+        if (options.debug) {
+            console.log('=== REPORT MODULE SETUP DEBUG ===');
+            console.log('🔧 API URL:', options.apiUrl);
+            console.log('🔧 Has API Key:', !!options.apiKey);
+            console.log('🔧 Default User:', options.user || 'Not configured');
+            console.log('🔧 Debug Mode:', options.debug);
+            console.log('==================================');
+        }
         // Pridáme konfiguráciu do runtime config
-        nuxt.options.runtimeConfig.public.reportModule = moduleOptions;
+        nuxt.options.runtimeConfig.public.reportModule = {
+            apiUrl: options.apiUrl,
+            apiKey: options.apiKey,
+            user: options.user || null,
+            debug: options.debug || false
+        };
         // Registrácia komponentov
         addComponent({
             name: 'ModalContent',
@@ -42,7 +53,7 @@ export default defineNuxtModule({
             }
         ]);
         if (options.debug) {
-            console.log('Report Module Options:', options);
+            console.log('✅ Report Module initialized successfully');
         }
     }
 });

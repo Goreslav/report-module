@@ -1,10 +1,5 @@
 import { defineNuxtModule, createResolver, addImports, addComponent } from '@nuxt/kit'
-import { defu } from 'defu'
-
-export interface ReportModuleOptions {
-  apiUrl?: string
-  debug?: boolean
-}
+import type { ReportModuleOptions } from './runtime/types'
 
 export default defineNuxtModule<ReportModuleOptions>({
   meta: {
@@ -17,20 +12,31 @@ export default defineNuxtModule<ReportModuleOptions>({
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    // DEBUG: Úplne všetko
-    console.log('=== MODULE SETUP DEBUG ===')
-    console.log('🔧 typeof options:', typeof options)
-    console.log('🔧 options keys:', Object.keys(options || {}))
-    console.log('🔧 Raw options:', JSON.stringify(options, null, 2))
-    console.log('===========================')
+    // Validácia povinných options
+    if (!options.apiKey) {
+      throw new Error('Report Module: apiKey is required. Please configure it in nuxt.config.ts')
+    }
 
-    // Použiť priamo options (bez defaults kým nevyriešime problém)
-    const moduleOptions = options || {}
+    if (!options.apiUrl) {
+      throw new Error('Report Module: apiUrl is required. Please configure it in nuxt.config.ts')
+    }
 
-    console.log('🔧 Using moduleOptions:', moduleOptions)
+    if (options.debug) {
+      console.log('=== REPORT MODULE SETUP DEBUG ===')
+      console.log('🔧 API URL:', options.apiUrl)
+      console.log('🔧 Has API Key:', !!options.apiKey)
+      console.log('🔧 Default User:', options.user || 'Not configured')
+      console.log('🔧 Debug Mode:', options.debug)
+      console.log('==================================')
+    }
 
     // Pridáme konfiguráciu do runtime config
-    nuxt.options.runtimeConfig.public.reportModule = moduleOptions
+    nuxt.options.runtimeConfig.public.reportModule = {
+      apiUrl: options.apiUrl,
+      apiKey: options.apiKey,
+      user: options.user || null,
+      debug: options.debug || false
+    }
 
     // Registrácia komponentov
     addComponent({
@@ -58,7 +64,10 @@ export default defineNuxtModule<ReportModuleOptions>({
     ])
 
     if (options.debug) {
-      console.log('Report Module Options:', options)
+      console.log('✅ Report Module initialized successfully')
     }
   }
 })
+
+// Export types pre TypeScript support
+export type { ReportModuleOptions, User, TicketPayload, TicketResponse } from './runtime/types'
