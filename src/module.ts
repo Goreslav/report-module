@@ -57,7 +57,8 @@ export default defineNuxtModule<ReportModuleOptions>({
     nuxt.options.runtimeConfig.public.reportModule = {
       apiUrl: options.apiUrl,
       user: options.user || null,
-      debug: options.debug || false
+      debug: options.debug || false,
+      apiKey: options.apiKey || null
     }
 
     addPlugin(resolver.resolve('./runtime/plugins/error-tracker.client'))
