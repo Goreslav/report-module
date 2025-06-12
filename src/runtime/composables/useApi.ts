@@ -7,6 +7,26 @@ export async function useApi<T>(
 ): Promise<{ data: { value: T }, error: { value: any } }> {
   const config = useRuntimeConfig().public.reportModule
 
+  console.log('🔧 Full Runtime Config:', useRuntimeConfig())
+  console.log('🔧 Public Config:', useRuntimeConfig().public)
+  console.log('🔧 Report Module Config:', config)
+
+  if (!config) {
+    console.error('❌ Report Module config is undefined!')
+    return
+  }
+
+  if (!config.apiUrl) {
+    console.error('❌ API URL is missing!')
+    return
+  }
+
+  if (!config.apiKey) {
+    console.error('❌ API Key is missing!')
+    return
+  }
+
+
   if (config.debug) {
     console.log('🔧 Report Module API Config:', {
       apiUrl: config.apiUrl,
