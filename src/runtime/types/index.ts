@@ -12,10 +12,11 @@ export interface ReportModuleOptions {
 }
 
 export interface TicketPayload {
-  linkToPage: string
-  description: string
-  fileIds?: string[]
-  reporter?: User
+  text: string
+  url: string
+  screenshot?: string | null
+  errors?: CapturedError[]
+  userAgent?: string
   timestamp?: string
   source?: string
 }
@@ -24,6 +25,11 @@ export interface TicketResponse {
   success: boolean
   ticketNumber: string | number
   message?: string
+  data?: {
+    id: number
+    ticketNumber: string
+    status: string
+  }
 }
 
 export interface FileUploadResponse {
@@ -42,6 +48,7 @@ export interface ApiResponse<T = any> {
   data?: T
   message?: string
   error?: string
+  statusCode?: number
 }
 
 export interface UploadedFile {
@@ -60,4 +67,35 @@ export interface InvalidFileInternal {
 export interface UploadingFileInternal {
   internalId: string
   file: File
+}
+
+export interface CapturedData {
+  url: string
+  userAgent: string
+  errors: CapturedError[]
+  viewport: {
+    width: number
+    height: number
+  } | null
+  screenshot: string | null
+  timestamp: number
+}
+
+export interface CapturedError {
+  type: 'console-error' | 'console-warn' | 'javascript-error' | 'promise-rejection'
+  content: string
+  filename?: string
+  lineno?: number
+  colno?: number
+  stack?: string
+  timestamp: number
+}
+
+export type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+
+export interface ApiOptions {
+  method?: ApiMethod
+  body?: any
+  headers?: Record<string, string>
+  timeout?: number
 }

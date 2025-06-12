@@ -4,12 +4,31 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmitOnError": false,
     "declaration": true,
-    "outDir": "dist"
+    "declarationMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"],
+      "#app": ["./node_modules/nuxt/dist/app"],
+      "#imports": ["./node_modules/nuxt/dist/app/composables"]
+    },
+    "types": ["node"],
+    "lib": ["DOM", "DOM.Iterable", "ES2020"]
   },
-  "include": ["src/module.ts"],
-  "exclude": ["node_modules", "dist", "playground"]
+  "include": [
+    "src/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "playground",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

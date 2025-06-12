@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = https://github.com/Goreslav/report-module.git
+[remote "new-origin"]
+	url = git@github.com:ovb-sk/pomoc-nuxt-module.git
+	fetch = +refs/heads/*:refs/remotes/new-origin/*

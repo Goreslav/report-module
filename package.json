@@ -40,19 +40,20 @@
   ],
   "author": "goreslav",
   "scripts": {
-    "build": "pnpm run clean && pnpm run build:tsc && pnpm run build:copy && pnpm run build:cjs",
+    "build": "unbuild",
+    "build:watch": "unbuild --watch",
     "clean": "rm -rf dist",
-    "build:tsc": "tsc",
-    "build:copy": "cp -r src/runtime dist/ && cp dist/module.js dist/module.mjs",
-    "build:cjs": "node scripts/create-cjs.js",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "unbuild --stub && nuxi prepare playground",
+    "prepack": "pnpm run build",
     "release": "pnpm run build && changelogen --release && git push --follow-tags",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.0",
