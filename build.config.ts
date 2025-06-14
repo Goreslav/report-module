@@ -1,16 +1,16 @@
-import { defineBuildConfig } from 'unbuild'
+import { defineBuildConfig } from 'unbuild';
 
 export default defineBuildConfig({
   entries: [
     {
       input: 'src/module',
-      name: 'module'
+      name: 'module',
     },
     {
       input: 'src/runtime/',
       outDir: 'dist/runtime',
-      declaration: false
-    }
+      declaration: false,
+    },
   ],
   declaration: true,
   clean: true,
@@ -22,16 +22,16 @@ export default defineBuildConfig({
     '#app',
     '#imports',
     'ofetch',
-    'html2canvas'
+    'html2canvas',
   ],
   rollup: {
     emitCJS: true,
     inlineDependencies: false,
     esbuild: {
       target: 'esnext',
-      minify: false
-    }
+      minify: false,
+    },
   },
   failOnWarn: false,
-  stub: false
-})
+  stub: false,
+});

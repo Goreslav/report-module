@@ -1,26 +1,27 @@
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
+// Proper generic function type namiesto any
+export function debounce<TArgs extends unknown[]>(
+  func: (...args: TArgs) => void,
   wait: number,
-  immediate = false
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  immediate = false,
+): (...args: TArgs) => void {
+  let timeout: NodeJS.Timeout | null = null;
 
-  return function executedFunction(...args: Parameters<T>) {
+  return function executedFunction(...args: TArgs) {
     const later = () => {
-      timeout = null
-      if (!immediate) func(...args)
-    }
+      timeout = null;
+      if (!immediate) func(...args);
+    };
 
-    const callNow = immediate && !timeout
+    const callNow = immediate && !timeout;
 
     if (timeout) {
-      clearTimeout(timeout)
+      clearTimeout(timeout);
     }
 
-    timeout = setTimeout(later, wait)
+    timeout = setTimeout(later, wait);
 
     if (callNow) {
-      func(...args)
+      func(...args);
     }
-  }
+  };
 }

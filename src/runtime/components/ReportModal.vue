@@ -19,53 +19,58 @@
         m-4 sm:m-0
       "
     >
-      <ModalContent @close="close" :captured-data="capturedData" :user="user"/>
+      <ModalContent
+        :captured-data="capturedData"
+        :user="user"
+        @close="close"
+      />
     </div>
   </dialog>
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue';
 
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    required: true
+    required: true,
   },
   user: {
     type: Object,
-    default: null
+    default: null,
   },
   capturedData: {
     type: Object,
-    default: () => ({})
-  }
-})
+    default: () => ({}),
+  },
+});
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
-const dialogRef = ref(null)
+const dialogRef = ref(null);
 
 const close = () => {
-  emit('close')
-}
+  emit('close');
+};
 
 const handleBackdropClick = (event) => {
   if (event.target === dialogRef.value) {
-    close()
+    close();
   }
-}
+};
 
 watch(
   () => props.isOpen,
   async (newValue) => {
-    await nextTick()
+    await nextTick();
     if (newValue && dialogRef.value) {
-      dialogRef.value.showModal()
-    } else if (dialogRef.value) {
-      dialogRef.value.close()
+      dialogRef.value.showModal();
+    }
+    else if (dialogRef.value) {
+      dialogRef.value.close();
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>

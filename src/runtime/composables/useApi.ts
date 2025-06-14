@@ -1,49 +1,36 @@
-import { $fetch } from 'ofetch'
-import { useRuntimeConfig } from '#app'
+import { $fetch } from 'ofetch';
+import { useRuntimeConfig } from '#app';
+
+interface ApiOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  body?: string | FormData | Record<string, unknown>;
+  headers?: Record<string, string>;
+  timeout?: number;
+}
 
 export async function useApi<T>(
   url: string,
-  options: any = {}
-): Promise<{ data: { value: T }, error: { value: any } }> {
-  const config = useRuntimeConfig().public.reportModule
-
-  console.log('🔧 Full Runtime Config:', useRuntimeConfig())
-  console.log('🔧 Public Config:', useRuntimeConfig().public)
-  console.log('🔧 Report Module Config:', config)
-
-  if (!config) {
-    console.error('❌ Report Module config is undefined!')
-    return
-  }
-
-  if (!config.apiUrl) {
-    console.error('❌ API URL is missing!')
-    return
-  }
-
-  if (!config.apiKey) {
-    console.error('❌ API Key is missing!')
-    return
-  }
-
+  options: ApiOptions = {},
+): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
+  const config = useRuntimeConfig().public.reportModule;
 
   if (config.debug) {
     console.log('🔧 Report Module API Config:', {
       apiUrl: config.apiUrl,
       hasApiKey: !!config.apiKey,
-      url: url
-    })
+      url: url,
+    });
   }
 
   try {
-    const fullUrl = `${config.apiUrl || ''}${url}`
+    const fullUrl = `${config.apiUrl || ''}${url}`;
     const headers: Record<string, string> = {
       'X-API-Key': config.apiKey,
       ...options.headers,
-    }
+    };
 
     if (!(options.body instanceof FormData)) {
-      headers['Content-Type'] = 'application/json'
+      headers['Content-Type'] = 'application/json';
     }
 
     if (config.debug) {
@@ -51,9 +38,10 @@ export async function useApi<T>(
         url: fullUrl,
         method: options.method || 'GET',
         hasApiKey: !!config.apiKey,
-        apiKeyPreview: config.apiKey.substring(0, 8) + '...'
-      })
+        apiKeyPreview: config.apiKey.substring(0, 8) + '...',
+      });
     }
+
     const result = await $fetch<T>(fullUrl, {
       ...options,
       headers,
@@ -61,27 +49,28 @@ export async function useApi<T>(
         console.error('❌ Report Module API Error:', {
           status: response.status,
           statusText: response.statusText,
-          url: fullUrl
-        })
+          url: fullUrl,
+        });
 
         if (response.status === 401) {
-          throw new Error('No permission')
+          throw new Error('No permission');
         }
       },
-    })
+    });
 
     if (config.debug) {
-      console.log('✅ Report Module API Success:', result)
+      console.log('✅ Report Module API Success:', result);
     }
 
     return {
       data: { value: result },
-      error: { value: null }
-    }
-  } catch (error) {
+      error: { value: null },
+    };
+  }
+  catch (error) {
     return {
-      data: { value: null as any },
-      error: { value: error }
-    }
+      data: { value: null },
+      error: { value: error instanceof Error ? error : new Error(String(error)) },
+    };
   }
 }

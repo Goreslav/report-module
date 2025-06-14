@@ -1,10 +1,10 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'node:fs';
 
-const content = readFileSync('dist/module.js', 'utf8')
+const content = readFileSync('dist/module.js', 'utf8');
 
 const cjsContent = content
-  .replace(/import\s+{\s*([^}]+)\s*}\s+from\s+['"]([^'"]+)['"]/g, 'const { $1 } = require("$2")')
-  .replace(/export default\s+/, 'module.exports = ')
+  .replace(/import \{ ([\w\s,]+) \} from ['"]([^'"]+)['"]/g, 'const { $1 } = require("$2")')
+  .replace(/export default /g, 'module.exports = ');
 
-writeFileSync('dist/module.cjs', cjsContent)
-console.log('✅ CJS version created')
+writeFileSync('dist/module.cjs', cjsContent);
+console.log('✅ CJS version created');

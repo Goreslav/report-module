@@ -1,4 +1,4 @@
-import { useApi } from './useApi'
+import { useApi } from './useApi';
 
 export const useTicketApi = () => {
   const createTicket = async (payload, user) => {
@@ -8,25 +8,25 @@ export const useTicketApi = () => {
       screenshot: payload.screenshot,
       errors: payload.errors || [],
       userAgent: payload.userAgent,
-      user: user
-    }
+      user: user,
+    };
 
-    const { data, error } = await useApi("/tickets", {
-      method: "POST",
+    const { data, error } = await useApi('/tickets', {
+      method: 'POST',
       body: JSON.stringify(ticketData),
       headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (error.value) {
-      throw error.value
+      throw error.value;
     }
 
-    return data.value
-  }
+    return data.value;
+  };
 
   return {
-    createTicket
-  }
-}
+    createTicket,
+  };
+};

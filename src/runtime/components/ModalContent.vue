@@ -15,11 +15,13 @@
           border-blue-500 border-t-transparent
         "
         role="status"
-      ></div>
+      />
     </div>
 
     <div class="flex flex-col gap-2.5 px-5 pt-5">
-      <h1 class="text-xl font-bold tracking-tight">Žiadosť o pomoc</h1>
+      <h1 class="text-xl font-bold tracking-tight">
+        Žiadosť o pomoc
+      </h1>
       <h2 class="text-md leading-5 tracking-tight text-[#8792A4]">
         Po zadaní popisu chyby sa pokúsime
         vyriešiť podľa veľkosti problému v čo najskoršom čase.
@@ -50,9 +52,12 @@
               placeholder="Popíšte čo sa stalo a aké kroky ste vykonali"
               :class="[formData.text ? 'pt-6' : '', 'focus:pt-6']"
               @blur="validateDescription"
-            ></textarea>
+            />
           </div>
-          <div v-if="descriptionError" class="text-red-500 mt-1 text-sm">
+          <div
+            v-if="descriptionError"
+            class="text-red-500 mt-1 text-sm"
+          >
             {{ descriptionError }}
           </div>
         </div>
@@ -87,16 +92,15 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, computed } from 'vue'
-import { useRuntimeConfig } from '#app'
-import { useTicketApi } from '../composables/useTicketApi'
+import { ref, computed } from 'vue';
+import { useTicketApi } from '../composables/useTicketApi';
+import { useRuntimeConfig } from '#app';
 
 const props = defineProps({
   user: {
     type: Object,
-    default: null
+    default: null,
   },
   capturedData: {
     type: Object,
@@ -104,71 +108,66 @@ const props = defineProps({
       url: '',
       screenshot: null,
       errors: [],
-      userAgent: ''
-    })
-  }
-})
+      userAgent: '',
+    }),
+  },
+});
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
-const isSubmitting = ref(false)
-const descriptionError = ref('')
+const isSubmitting = ref(false);
+const descriptionError = ref('');
 
 const formData = ref({
-  text: ''
-})
+  text: '',
+});
 
-const config = useRuntimeConfig().public.reportModule
-const { createTicket } = useTicketApi()
+const config = useRuntimeConfig().public.reportModule;
+const { createTicket } = useTicketApi();
 
 const isFormValid = computed(() => {
-  return formData.value.text.trim().length >= 10 && !descriptionError.value
-})
+  return formData.value.text.trim().length >= 10 && !descriptionError.value;
+});
 
 const validateDescription = () => {
-  const desc = formData.value.text.trim()
+  const desc = formData.value.text.trim();
   if (!desc) {
-    descriptionError.value = 'Popis problému je povinný'
-    return false
+    descriptionError.value = 'Popis problému je povinný';
+    return false;
   }
   if (desc.length < 10) {
-    descriptionError.value = 'Popis musí mať aspoň 10 znakov'
-    return false
+    descriptionError.value = 'Popis musí mať aspoň 10 znakov';
+    return false;
   }
-  descriptionError.value = ''
-  return true
-}
+  descriptionError.value = '';
+  return true;
+};
 
 const resetForm = () => {
   formData.value = {
-    text: ''
-  }
-  descriptionError.value = ''
-}
-
-const resetToForm = () => {
-  resetForm()
-  emit('close')
-}
+    text: '',
+  };
+  descriptionError.value = '';
+};
 
 const handleSubmit = async () => {
-  const isDescValid = validateDescription()
+  const isDescValid = validateDescription();
 
   if (!isDescValid) {
-    return
+    return;
   }
 
-  isSubmitting.value = true
+  isSubmitting.value = true;
 
   try {
-    const user = props.user
+    const user = props.user;
 
     if (config.debug) {
       console.log('🎫 Submitting ticket with data:', {
         user,
         text: formData.value.text,
-        capturedData: props.capturedData
-      })
+        capturedData: props.capturedData,
+      });
     }
 
     const ticketPayload = {
@@ -176,25 +175,27 @@ const handleSubmit = async () => {
       url: props.capturedData?.url,
       screenshot: props.capturedData?.screenshot,
       errors: props.capturedData?.errors,
-      userAgent: props.capturedData?.userAgent
-    }
+      userAgent: props.capturedData?.userAgent,
+    };
 
-    const result = await createTicket(ticketPayload, user)
+    const result = await createTicket(ticketPayload, user);
 
     if (result.success) {
-      emit('close')
-
-    } else {
-      throw new Error('Nepodarilo sa vytvoriť ticket')
+      emit('close');
     }
-
-  } catch (error) {
-    let errorMessage = 'Nastala chyba pri odosielaní.'
-    if (config.debug) {
-      alert(errorMessage)
+    else {
+      throw new Error('Nepodarilo sa vytvoriť ticket');
     }
-  } finally {
-    isSubmitting.value = false
   }
-}
+  catch (error) {
+    const errorMessage = 'Nastala chyba pri odosielaní.';
+    if (config.debug) {
+      console.log(error);
+      alert(errorMessage);
+    }
+  }
+  finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
