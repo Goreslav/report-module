@@ -72,87 +72,24 @@ export const useCaptureUtils = () => {
     });
   };
 
-  const captureScreenshot = async (): Promise<string | null> => {
+  const captureScreenshot = async () => {
     if (typeof window === 'undefined') return null;
 
     try {
-      // Pokus s html2canvas
       const canvas = await html2canvas(document.body, {
         allowTaint: true,
         useCORS: true,
-        scale: 1.0, // ✅ Plné rozlíšenie
+        scale: 0.9,
         width: window.innerWidth,
-        height: window.innerHeight,
-        backgroundColor: '#ffffff',
-        logging: false,
-        imageTimeout: 15000,
-        removeContainer: true,
-        dpi: window.devicePixelRatio || 1,
-        foreignObjectRendering: true,
+        height: window.innerHeight
       });
 
       const dataURL = canvas.toDataURL('image/png', 0.9);
       return dataURL;
-    }
-    catch (error) {
-      console.warn('html2canvas failed, creating fallback screenshot:', error);
 
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        if (!ctx) return null;
-
-        canvas.width = 800;
-        canvas.height = 600;
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#f3f4f6');
-        gradient.addColorStop(1, '#e5e7eb');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#374151';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText('Report Module Screenshot', 20, 40);
-
-        ctx.font = '16px Arial';
-        ctx.fillStyle = '#6b7280';
-
-        const lines = [
-          `URL: ${window.location.href}`,
-          `Viewport: ${window.innerWidth}x${window.innerHeight}`,
-          `User Agent: ${navigator.userAgent.substring(0, 80)}...`,
-          `Timestamp: ${new Date().toLocaleString()}`,
-          '',
-          'Note: Full page screenshot unavailable.',
-          'This is a fallback capture with page metadata.',
-        ];
-
-        lines.forEach((line, index) => {
-          const y = 80 + (index * 25);
-          if (y < canvas.height - 30) {
-            ctx.fillText(line, 20, y);
-          }
-        });
-
-        ctx.strokeStyle = '#9ca3af';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-        ctx.fillStyle = '#ef4444';
-        ctx.beginPath();
-        ctx.arc(canvas.width - 30, 30, 8, 0, 2 * Math.PI);
-        ctx.fill();
-
-        const dataURL = canvas.toDataURL('image/png');
-        return dataURL;
-      }
-      catch (fallbackError) {
-        console.error('Fallback screenshot creation failed:', fallbackError);
-        return null;
-      }
+    } catch (error) {
+      console.warn("html2canvas failed:", error);
+      return null;
     }
   };
 
