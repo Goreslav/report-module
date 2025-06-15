@@ -3,13 +3,6 @@ import type { ApiOptions } from '../types';
 import { moduleLogger } from '../utils/logger';
 import { useRuntimeConfig } from '#app';
 
-// interface ApiOptions {
-//   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-//   body?: string | FormData | Record<string, unknown>;
-//   headers?: Record<string, string>;
-//   timeout?: number;
-// }
-
 export async function useApi<T>(
   url: string,
   options: ApiOptions = {},
@@ -47,7 +40,9 @@ export async function useApi<T>(
       ...options,
       headers,
       onResponseError: ({ response }) => {
-        error('❌ Report Module API Error:', {
+        console.log('ttttttt');
+        console.log(response);
+        moduleLogger.error('❌ Report Module API Error:', {
           status: response.status,
           statusText: response.statusText,
           url: fullUrl,
