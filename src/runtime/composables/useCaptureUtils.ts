@@ -76,61 +76,45 @@ export const useCaptureUtils = () => {
     if (typeof window === 'undefined') return null;
 
     try {
-      // ✅ KRITICKÉ: Počkajte na načítanie všetkého
-      await document.fonts.ready;
-
-      // Počkajte na SVG a obrázky
-      await new Promise((resolve) => {
-        if (document.readyState === 'complete') {
-          resolve(true);
-        }
-        else {
-          window.addEventListener('load', resolve);
-        }
-      });
-
       const canvas = await html2canvas(document.body, {
-        scale: 0.9,
-        backgroundColor: '#ffffff',
-        allowTaint: true,
-        useCORS: true,
+        allowTaint: true,              // ✅ Existuje
+        useCORS: true,                 // ✅ Existuje
+        scale: 0.9,                    // ✅ Existuje
+        backgroundColor: '#ffffff',    // ✅ Existuje
 
-        // ✅ KĽÚČOVÉ pre SVG ikony a ilustrácie
-        foreignObjectRendering: true,
-        svg: true,
-        letterRendering: true,
+        // === RENDERING ===
+        foreignObjectRendering: true,  // ✅ Existuje
 
-        // ✅ Dlhší timeout pre načítanie obrázkov
-        imageTimeout: 30000,
-        removeContainer: true,
+        // === TIMEOUTS ===
+        imageTimeout: 30000,          // ✅ Existuje
 
-        // ✅ Callback pre úpravu klonovaného DOM
-        onclone: (clonedDoc) => {
-          // Force načítanie všetkých SVG a fontov
-          const svgs = clonedDoc.querySelectorAll('svg');
-          svgs.forEach((svg) => {
-            svg.style.display = 'inline-block';
-          });
+        // === CLEANUP ===
+        removeContainer: true,        // ✅ Existuje
 
-          // Zabezpečte že fonty sú načítané
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-          * {
-            font-display: block !important;
-            -webkit-font-smoothing: antialiased;
-          }
-        `;
-          clonedDoc.head.appendChild(style);
+        // === SIZE ===
+        width: window.innerWidth,     // ✅ Existuje
+        height: window.innerHeight,   // ✅ Existuje
 
+        // === DEBUGGING ===
+        logging: false,               // ✅ Existuje
+
+        // === CALLBACKS ===
+        onclone: (clonedDoc) => {     // ✅ Existuje
+          // Môžete upraviť klonovaný dokument
           return clonedDoc;
-        },
+        }
+
+        // ❌ NEEXISTUJÚ - ODSTRÁNIŤ:
+        // svg: true,                 // ❌ Nie je v dokumentácii!
+        // letterRendering: true,     // ❌ Nie je v dokumentácii!
+        // dpi: window.devicePixelRatio, // ❌ Nie je v dokumentácii!
       });
 
       const dataURL = canvas.toDataURL('image/png', 1.0);
       return dataURL;
-    }
-    catch (error) {
-      console.warn('html2canvas failed:', error);
+
+    } catch (error) {
+      console.warn("html2canvas failed:", error);
       return null;
     }
   };
