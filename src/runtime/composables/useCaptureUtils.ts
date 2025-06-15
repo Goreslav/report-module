@@ -77,37 +77,40 @@ export const useCaptureUtils = () => {
 
     try {
       const canvas = await html2canvas(document.body, {
-        allowTaint: true,              // ✅ Existuje
-        useCORS: true,                 // ✅ Existuje
-        scale: 0.9,                    // ✅ Existuje
-        backgroundColor: '#ffffff',    // ✅ Existuje
+        scale: 0.9,
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        useCORS: true,
+        foreignObjectRendering: true,
+        imageTimeout: 30000,
+        removeContainer: true,
+        logging: false,
 
-        // === RENDERING ===
-        foreignObjectRendering: true,  // ✅ Existuje
+        // Callback pre úpravu DOM pred renderingom
+        onclone: (clonedDoc) => {
+          // Zabezpečte že všetky SVG sú viditeľné
+          const svgs = clonedDoc.querySelectorAll('svg');
+          svgs.forEach(svg => {
+            svg.style.display = 'block';
+            svg.style.visibility = 'visible';
+          });
 
-        // === TIMEOUTS ===
-        imageTimeout: 30000,          // ✅ Existuje
+          // Pridajte style pre lepší rendering
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+          * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+          svg {
+            display: block !important;
+            visibility: visible !important;
+          }
+        `;
+          clonedDoc.head.appendChild(style);
 
-        // === CLEANUP ===
-        removeContainer: true,        // ✅ Existuje
-
-        // === SIZE ===
-        width: window.innerWidth,     // ✅ Existuje
-        height: window.innerHeight,   // ✅ Existuje
-
-        // === DEBUGGING ===
-        logging: false,               // ✅ Existuje
-
-        // === CALLBACKS ===
-        onclone: (clonedDoc) => {     // ✅ Existuje
-          // Môžete upraviť klonovaný dokument
           return clonedDoc;
         }
-
-        // ❌ NEEXISTUJÚ - ODSTRÁNIŤ:
-        // svg: true,                 // ❌ Nie je v dokumentácii!
-        // letterRendering: true,     // ❌ Nie je v dokumentácii!
-        // dpi: window.devicePixelRatio, // ❌ Nie je v dokumentácii!
       });
 
       const dataURL = canvas.toDataURL('image/png', 1.0);
