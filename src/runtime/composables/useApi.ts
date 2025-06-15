@@ -7,26 +7,20 @@ export async function useApi<T>(
   url: string,
   options: ApiOptions = {},
 ): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
-  const config = useRuntimeConfig();
-  const publicConfig = config.public.reportModule;
+  const config = useRuntimeConfig().public.reportModule;
 
-  const serverConfig = config.reportModule;
-
-  if (publicConfig.debug) {
-    console.log('ttttt')
-    console.log(config)
-    console.log(serverConfig)
+  if (config.debug) {
     moduleLogger.info('🔧 API Config:', {
-      apiUrl: publicConfig.apiUrl,
-      hasApiKey: !!serverConfig?.apiKey,
+      apiUrl: config.apiUrl,
+      hasApiKey: !!config.apiKey,
       url: url,
     });
   }
 
   try {
-    const fullUrl = `${publicConfig.apiUrl || ''}${url}`;
+    const fullUrl = `${config.apiUrl || ''}${url}`;
     const headers: Record<string, string> = {
-      'X-API-Key': serverConfig?.apiKey || '', // ✅ API kľúč zo server config
+      'X-API-Key': config.apiKey || '',
       ...options.headers,
     };
 
@@ -34,11 +28,11 @@ export async function useApi<T>(
       headers['Content-Type'] = 'application/json';
     }
 
-    if (publicConfig.debug) {
+    if (config.debug) {
       moduleLogger.info('🚀 API Call:', {
         url: fullUrl,
         method: options.method || 'GET',
-        hasApiKey: !!serverConfig?.apiKey, // ✅ Správna kontrola
+        hasApiKey: !!config.apiKey,
       });
     }
 
@@ -58,7 +52,7 @@ export async function useApi<T>(
       },
     });
 
-    if (publicConfig.debug) {
+    if (config.debug) {
       moduleLogger.success('✅ API Success:', result);
     }
 
