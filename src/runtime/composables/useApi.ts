@@ -1,6 +1,6 @@
 import { $fetch } from 'ofetch';
-import { moduleLogger } from '../utils/logger';
 import type { ApiOptions } from '../types';
+import { moduleLogger } from '../utils/logger';
 import { useRuntimeConfig } from '#app';
 
 export async function useApi<T>(
@@ -10,6 +10,7 @@ export async function useApi<T>(
   const config = useRuntimeConfig().public.reportModule;
 
   if (config.debug) {
+    moduleLogger.log(config);
     moduleLogger.info('🔧 API Config:', {
       apiUrl: config.apiUrl,
       hasApiKey: !!config.apiKey,
@@ -20,7 +21,7 @@ export async function useApi<T>(
   try {
     const fullUrl = `${config.apiUrl || ''}${url}`;
     const headers: Record<string, string> = {
-      'X-API-Key': config.apiKey || '',
+      'X-API-Key': config.apiKey,
       ...options.headers,
     };
 
@@ -29,7 +30,7 @@ export async function useApi<T>(
     }
 
     if (config.debug) {
-      moduleLogger.info('🚀 API Call:', {
+      moduleLogger.log('🚀 API Call:', {
         url: fullUrl,
         method: options.method || 'GET',
         hasApiKey: !!config.apiKey,
@@ -53,7 +54,7 @@ export async function useApi<T>(
     });
 
     if (config.debug) {
-      moduleLogger.success('✅ API Success:', result);
+      moduleLogger.log('✅ Report Module API Success:', result);
     }
 
     return {
@@ -61,11 +62,10 @@ export async function useApi<T>(
       error: { value: null },
     };
   }
-  catch (apiError) {
-    moduleLogger.error('❌ API Request failed:', apiError);
+  catch (error) {
     return {
       data: { value: null },
-      error: { value: apiError instanceof Error ? apiError : new Error(String(apiError)) },
+      error: { value: error instanceof Error ? error : new Error(String(error)) },
     };
   }
 }
