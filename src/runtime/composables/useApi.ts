@@ -1,26 +1,31 @@
 import { $fetch } from 'ofetch';
-import type { ApiOptions } from '../types';
 import { moduleLogger } from '../utils/logger';
+import type { ApiOptions } from '../types';
 import { useRuntimeConfig } from '#app';
 
 export async function useApi<T>(
   url: string,
   options: ApiOptions = {},
 ): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
-  const config = useRuntimeConfig().public.reportModule;
+  const config = useRuntimeConfig();
+  const publicConfig = config.public.reportModule;
 
-  if (config.debug) {
+  const serverConfig = config.reportModule;
+
+  if (publicConfig.debug) {
+    console.log('ttttt')
+    console.log(serverConfig)
     moduleLogger.info('🔧 API Config:', {
-      apiUrl: config.apiUrl,
-      hasApiKey: !!config.apiKey,
+      apiUrl: publicConfig.apiUrl,
+      hasApiKey: !!serverConfig?.apiKey,
       url: url,
     });
   }
 
   try {
-    const fullUrl = `${config.apiUrl || ''}${url}`;
+    const fullUrl = `${publicConfig.apiUrl || ''}${url}`;
     const headers: Record<string, string> = {
-      'X-API-Key': config.apiKey,
+      'X-API-Key': serverConfig?.apiKey || '', // ✅ API kľúč zo server config
       ...options.headers,
     };
 
@@ -28,11 +33,11 @@ export async function useApi<T>(
       headers['Content-Type'] = 'application/json';
     }
 
-    if (config.debug) {
-      moduleLogger.log('🚀 API Call:', {
+    if (publicConfig.debug) {
+      moduleLogger.info('🚀 API Call:', {
         url: fullUrl,
         method: options.method || 'GET',
-        hasApiKey: !!config.apiKey,
+        hasApiKey: !!serverConfig?.apiKey, // ✅ Správna kontrola
       });
     }
 
@@ -40,8 +45,6 @@ export async function useApi<T>(
       ...options,
       headers,
       onResponseError: ({ response }) => {
-        console.log('ttttttt');
-        console.log(response);
         moduleLogger.error('❌ Report Module API Error:', {
           status: response.status,
           statusText: response.statusText,
@@ -54,8 +57,8 @@ export async function useApi<T>(
       },
     });
 
-    if (config.debug) {
-      moduleLogger.log('✅ Report Module API Success:', result);
+    if (publicConfig.debug) {
+      moduleLogger.success('✅ API Success:', result);
     }
 
     return {
@@ -63,10 +66,11 @@ export async function useApi<T>(
       error: { value: null },
     };
   }
-  catch (error) {
+  catch (apiError) {
+    moduleLogger.error('❌ API Request failed:', apiError);
     return {
       data: { value: null },
-      error: { value: error instanceof Error ? error : new Error(String(error)) },
+      error: { value: apiError instanceof Error ? apiError : new Error(String(apiError)) },
     };
   }
 }
