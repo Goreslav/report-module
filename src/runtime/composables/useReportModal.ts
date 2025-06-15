@@ -1,45 +1,21 @@
 import { ref, createApp, h } from 'vue';
 import ReportModal from '../components/ReportModal.vue';
-import type { User, CapturedData } from '../types';
+import type { User, CapturedData, ReportModuleOptions } from '../types';
+import { moduleLogger } from '../utils/logger';
 import { useCaptureUtils } from './useCaptureUtils';
 import { useRuntimeConfig } from '#app';
-import { moduleLogger } from '../utils/logger';
-
 
 const currentUser = ref<User | null>(null);
 
 export const useReportModal = () => {
-  const config = useRuntimeConfig().public.reportModule;
+  const runtime = useRuntimeConfig();
+  const config = runtime.public.reportModule as ReportModuleOptions;
 
-  const setUser = (user: User) => {
-    if (!user || typeof user !== 'object') {
-      return;
-    }
-
-    if (!user.name || typeof user.name !== 'string') {
-      return;
-    }
-
-    if (!user.ma || typeof user.ma !== 'number') {
-      return;
-    }
-
-    if (!user.level || typeof user.level !== 'string') {
-      return;
-    }
-
-    currentUser.value = {
-      name: user.name,
-      ma: user.ma,
-      level: user.level,
-    };
+  const setUser = (user: User): void => {
+    currentUser.value = { ...user };
 
     if (config.debug) {
-      moduleLogger.log('👤 Report Module User set:', {
-        name: user.name,
-        ma: user.ma,
-        level: user.level,
-      });
+      moduleLogger.log('👤 Report Module User set:', currentUser.value);
     }
   };
 
@@ -55,7 +31,6 @@ export const useReportModal = () => {
     const app = createApp({
       setup() {
         const isOpen = ref(true);
-
         const closeModal = () => {
           isOpen.value = false;
           setTimeout(() => {
@@ -65,11 +40,10 @@ export const useReportModal = () => {
             }
           }, 200);
         };
-
         return () => h(ReportModal, {
           isOpen: isOpen.value,
           user: userToUse,
-          capturedData: capturedData,
+          capturedData,
           onClose: closeModal,
         });
       },
@@ -79,37 +53,32 @@ export const useReportModal = () => {
     return app;
   };
 
-  const getFallbackCapturedData = (): CapturedData => ({
-    url: typeof window !== 'undefined' ? window.location.href : '',
-    screenshot: null,
-    errors: [],
-    userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
-    viewport: typeof window !== 'undefined'
-      ? {
-          width: window.innerWidth,
-          height: window.innerHeight,
-        }
-      : null,
-    timestamp: Date.now(),
-  });
+  const getFallbackCapturedData = (): CapturedData => {
+    return {
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      screenshot: null,
+      errors: [],
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
+      viewport: typeof window !== 'undefined'
+        ? { width: window.innerWidth, height: window.innerHeight }
+        : null,
+      timestamp: Date.now(),
+    };
+  };
 
-  const showModal = async () => {
-    if (typeof window === 'undefined') return;
+  const showModal = async (): Promise<void> => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-    const userToUse: User | null = currentUser.value;
-
-    if (!userToUse) {
+    const user = currentUser.value;
+    if (!user) {
       moduleLogger.warn('⚠️ User not set. Call setUser() before opening modal.');
       return;
     }
 
-    if (!userToUse.name || !userToUse.ma || !userToUse.level) {
-      moduleLogger.warn('⚠️ User data incomplete:', userToUse);
-      return;
-    }
-
     if (config.debug) {
-      moduleLogger.log('🚀 Opening Report Modal with user:', userToUse);
+      moduleLogger.log('🚀 Opening Report Modal with user:', user);
       moduleLogger.log('📊 Collecting captured data...');
     }
 
@@ -122,27 +91,24 @@ export const useReportModal = () => {
         moduleLogger.log('✅ Data capture completed:', capturedData);
       }
 
-      createModalApp(capturedData, userToUse);
+      createModalApp(capturedData, user);
     }
-    catch (error) {
-      moduleLogger.warn('⚠️ Data capture failed, using fallback:', error);
+    catch (err: unknown) {
+      if (config.debug) {
+        moduleLogger.warn('⚠️ Data capture failed, using fallback:', err);
+      }
 
       const fallbackData = getFallbackCapturedData();
-      createModalApp(fallbackData, userToUse);
+      createModalApp(fallbackData, user);
     }
   };
 
-  const clearUser = () => {
+  const clearUser = (): void => {
     currentUser.value = null;
     if (config.debug) {
       moduleLogger.log('👤 Report Module User cleared');
     }
   };
 
-  return {
-    showModal,
-    setUser,
-    getUser,
-    clearUser,
-  };
+  return { showModal, setUser, getUser, clearUser };
 };

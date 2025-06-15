@@ -15,7 +15,7 @@ interface CapturedError {
   lineno?: number;
   colno?: number;
   stack?: string;
-  timestamp?: number;
+  timestamp: number;
 }
 
 interface Html2CanvasOptions {

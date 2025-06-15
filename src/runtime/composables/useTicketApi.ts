@@ -1,17 +1,24 @@
+import type { User, TicketPayload, TicketResponse } from '../types';
 import { useApi } from './useApi';
 
 export const useTicketApi = () => {
-  const createTicket = async (payload, user) => {
+  const createTicket = async (
+    payload: TicketPayload,
+    user: User,
+  ): Promise<TicketResponse> => {
     const ticketData = {
       text: payload.text,
       url: payload.url,
       screenshot: payload.screenshot,
-      errors: payload.errors || [],
+      errors: payload.errors ?? [],
       userAgent: payload.userAgent,
-      user: user,
+      viewport: payload.viewport,
+      timestamp: payload.timestamp,
+      source: payload.source,
+      user,
     };
 
-    const { data, error } = await useApi('/tickets', {
+    const { data, error } = await useApi<TicketResponse>('/tickets', {
       method: 'POST',
       body: JSON.stringify(ticketData),
       headers: {
@@ -23,7 +30,7 @@ export const useTicketApi = () => {
       throw error.value;
     }
 
-    return data.value;
+    return data.value as TicketResponse;
   };
 
   return {

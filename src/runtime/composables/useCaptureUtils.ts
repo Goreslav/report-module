@@ -14,7 +14,7 @@ export const useCaptureUtils = () => {
     window._reportModuleCapturedErrors = window._reportModuleCapturedErrors || [];
     window._reportModuleOriginalConsoleError = console.error;
 
-    console.error = function (...args: any[]) {
+    console.error = function (...args: unknown[]) {
       const errorData: CapturedError = {
         type: 'console-error',
         content: args.map(arg =>
@@ -29,7 +29,7 @@ export const useCaptureUtils = () => {
     };
 
     window._reportModuleOriginalConsoleWarn = console.warn;
-    console.warn = function (...args: any[]) {
+    console.warn = function (...args: unknown[]) {
       const warnData: CapturedError = {
         type: 'console-warn',
         content: args.map(arg =>
@@ -77,23 +77,22 @@ export const useCaptureUtils = () => {
     if (typeof window === 'undefined') return null;
 
     try {
-
       const canvas = await html2canvas(document.body, {
         scale: 1,
         backgroundColor: '#ffffff',
         allowTaint: true,
         useCORS: true,
         foreignObjectRendering: false,
-        imageTimeout: 30000,
+        imageTimeout: 3000,
         width: window.innerWidth,
         height: window.innerHeight,
       });
 
       const dataURL = canvas.toDataURL('image/png', 0.9);
       return dataURL;
-
-    } catch (error) {
-      moduleLogger.warn("html2canvas failed:", error);
+    }
+    catch (error) {
+      moduleLogger.error('html2canvas failed:', error);
       return null;
     }
   };
@@ -133,15 +132,12 @@ export const useCaptureUtils = () => {
       moduleLogger.log('📸 Capturing screenshot...');
       data.screenshot = await captureScreenshot();
 
-      if (data.screenshot) {
-        moduleLogger.log('✅ Screenshot captured successfully');
-      }
-      else {
+      if (!data.screenshot) {
         moduleLogger.warn('⚠️ Screenshot capture returned null');
       }
     }
     catch (error) {
-      moduleLogger.error('❌ Screenshot capture failed:', error);
+      moduleLogger.error(error, '❌ Screenshot capture failed:');
       data.screenshot = null;
     }
 

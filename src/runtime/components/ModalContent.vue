@@ -95,8 +95,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useTicketApi } from '../composables/useTicketApi';
+import { moduleLogger } from '../utils/logger'; // ✅ Import loggera
 import { useRuntimeConfig } from '#app';
-import { moduleLogger } from '../utils/logger';  // ✅ Import loggera
 
 const props = defineProps({
   user: {
@@ -197,7 +197,7 @@ const handleSubmit = async () => {
     moduleLogger.error('❌ Ticket submission failed:', {
       error: error.message,
       user: props.user,
-      textLength: formData.value.text.length
+      textLength: formData.value.text.length,
     });
 
     if (config.debug) {

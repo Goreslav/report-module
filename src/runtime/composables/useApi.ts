@@ -1,5 +1,5 @@
 import { $fetch } from 'ofetch';
-import type { ApiOptions } from '../types';
+import type { ApiOptions, ReportModuleOptions } from '../types';
 import { moduleLogger } from '../utils/logger';
 import { useRuntimeConfig } from '#app';
 
@@ -7,32 +7,33 @@ export async function useApi<T>(
   url: string,
   options: ApiOptions = {},
 ): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
-  const config = useRuntimeConfig().public.reportModule;
+  const runtime = useRuntimeConfig();
+  const config = runtime.public.reportModule as ReportModuleOptions;
 
   if (config.debug) {
     moduleLogger.info('🔧 API Config:', {
       apiUrl: config.apiUrl,
-      hasApiKey: !!config.apiKey,
-      url: url,
+      hasApiKey: Boolean(config.apiKey),
+      url,
     });
   }
 
   try {
-    const fullUrl = `${config.apiUrl || ''}${url}`;
+    const fullUrl = `${config.apiUrl}${url}`;
     const headers: Record<string, string> = {
       'X-API-Key': config.apiKey,
       ...options.headers,
     };
 
-    if (!(options.body instanceof FormData)) {
+    if (options.body && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
     }
 
     if (config.debug) {
       moduleLogger.log('🚀 API Call:', {
         url: fullUrl,
-        method: options.method || 'GET',
-        hasApiKey: !!config.apiKey,
+        method: options.method ?? 'GET',
+        hasApiKey: Boolean(config.apiKey),
       });
     }
 
@@ -56,15 +57,17 @@ export async function useApi<T>(
       moduleLogger.log('✅ Report Module API Success:', result);
     }
 
-    return {
-      data: { value: result },
-      error: { value: null },
-    };
+    return { data: { value: result }, error: { value: null } };
   }
-  catch (error) {
-    return {
-      data: { value: null },
-      error: { value: error instanceof Error ? error : new Error(String(error)) },
-    };
+  catch (unknownError: unknown) {
+    const error = unknownError instanceof Error
+      ? unknownError
+      : new Error(String(unknownError));
+
+    if (config.debug) {
+      moduleLogger.error('❌ useApi caught error:', error);
+    }
+
+    return { data: { value: null }, error: { value: error } };
   }
 }
