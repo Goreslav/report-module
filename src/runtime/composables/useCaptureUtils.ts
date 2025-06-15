@@ -1,10 +1,12 @@
 import { ref } from 'vue';
 import html2canvas from 'html2canvas';
 import type { CapturedError, CapturedData } from '../types';
+import { useLogger } from './useLogger';
 
 const capturedErrors = ref<CapturedError[]>([]);
 
 export const useCaptureUtils = () => {
+  const { log, warn, error } = useLogger();
   const startErrorTracking = () => {
     if (typeof window === 'undefined') return;
     if (window._reportModuleErrorCaptureInitialized) return;
@@ -72,14 +74,13 @@ export const useCaptureUtils = () => {
     });
   };
 
-
-
   const captureScreenshot = async () => {
     if (typeof window === 'undefined') return null;
 
     try {
+
       const canvas = await html2canvas(document.body, {
-        scale: 0.9,
+        scale: 1,
         backgroundColor: '#ffffff',
         allowTaint: true,
         useCORS: true,
@@ -89,11 +90,11 @@ export const useCaptureUtils = () => {
         height: window.innerHeight,
       });
 
-      const dataURL = canvas.toDataURL('image/png', 1.0);
+      const dataURL = canvas.toDataURL('image/png', 0.9);
       return dataURL;
 
     } catch (error) {
-      console.warn("html2canvas failed:", error);
+      warn("html2canvas failed:", error);
       return null;
     }
   };
@@ -130,18 +131,18 @@ export const useCaptureUtils = () => {
     };
 
     try {
-      console.log('📸 Capturing screenshot...');
+        log('📸 Capturing screenshot...');
       data.screenshot = await captureScreenshot();
 
       if (data.screenshot) {
-        console.log('✅ Screenshot captured successfully');
+        log('✅ Screenshot captured successfully');
       }
       else {
-        console.warn('⚠️ Screenshot capture returned null');
+        warn('⚠️ Screenshot capture returned null');
       }
     }
     catch (error) {
-      console.error('❌ Screenshot capture failed:', error);
+      error('❌ Screenshot capture failed:', error);
       data.screenshot = null;
     }
 

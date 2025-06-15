@@ -43,12 +43,20 @@ export default defineNuxtModule<ReportModuleOptions>({
     }
 
     if (options.debug) {
-      console.log('🔧 [Report Module] Setup Debug Info:');
-      console.log('   API URL:', options.apiUrl);
-      console.log('   Has API Key:', !!options.apiKey);
-      console.log('   API Key Preview:', options.apiKey.substring(0, 8) + '...');
-      console.log('   Default User:', options.user ? `${options.user.name} (${options.user.id})` : 'Not configured');
-      console.log('   Debug Mode:', options.debug);
+      const logMessage = '🔧 [Report Module] Setup Debug Info:';
+      const logData = {
+        apiUrl: options.apiUrl,
+        hasApiKey: !!options.apiKey,
+        apiKeyPreview: options.apiKey.substring(0, 8) + '...',
+        hasUser: !!options.user,
+        hasLogger: !!options.logger,
+      };
+
+      if (options.logger) {
+        options.logger.log(logMessage, logData);
+      } else {
+        console.log(logMessage, logData);
+      }
     }
 
     nuxt.options.runtimeConfig.reportModule = {
@@ -59,7 +67,7 @@ export default defineNuxtModule<ReportModuleOptions>({
       apiUrl: options.apiUrl,
       user: options.user || null,
       debug: options.debug || false,
-      apiKey: options.apiKey || null,
+      // apiKey: options.apiKey || null,
     };
 
     addPlugin(resolver.resolve('./runtime/plugins/error-tracker.client'));
@@ -88,7 +96,12 @@ export default defineNuxtModule<ReportModuleOptions>({
     ]);
 
     if (options.debug) {
-      console.log('✅ [Report Module] Initialized successfully');
+      const successMsg = '✅ [Report Module] Initialized successfully';
+      if (options.logger) {
+        options.logger.log(successMsg);
+      } else {
+        console.log(successMsg);
+      }
     }
   },
 });

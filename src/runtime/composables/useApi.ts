@@ -1,21 +1,24 @@
 import { $fetch } from 'ofetch';
+import type { ApiOptions } from '../types';
+import { useLogger } from './useLogger';
 import { useRuntimeConfig } from '#app';
 
-interface ApiOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  body?: string | FormData | Record<string, unknown>;
-  headers?: Record<string, string>;
-  timeout?: number;
-}
+// interface ApiOptions {
+//   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+//   body?: string | FormData | Record<string, unknown>;
+//   headers?: Record<string, string>;
+//   timeout?: number;
+// }
 
 export async function useApi<T>(
   url: string,
   options: ApiOptions = {},
 ): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
   const config = useRuntimeConfig().public.reportModule;
+  const { log, warn, error } = useLogger();
 
   if (config.debug) {
-    console.log('🔧 Report Module API Config:', {
+    log('🔧 API Config:', {
       apiUrl: config.apiUrl,
       hasApiKey: !!config.apiKey,
       url: url,
@@ -34,11 +37,10 @@ export async function useApi<T>(
     }
 
     if (config.debug) {
-      console.log('🚀 Report Module API Call:', {
+      log('🚀 API Call:', {
         url: fullUrl,
         method: options.method || 'GET',
         hasApiKey: !!config.apiKey,
-        apiKeyPreview: config.apiKey.substring(0, 8) + '...',
       });
     }
 
@@ -46,7 +48,7 @@ export async function useApi<T>(
       ...options,
       headers,
       onResponseError: ({ response }) => {
-        console.error('❌ Report Module API Error:', {
+        error('❌ Report Module API Error:', {
           status: response.status,
           statusText: response.statusText,
           url: fullUrl,
@@ -59,7 +61,7 @@ export async function useApi<T>(
     });
 
     if (config.debug) {
-      console.log('✅ Report Module API Success:', result);
+      log('✅ Report Module API Success:', result);
     }
 
     return {
