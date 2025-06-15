@@ -2,6 +2,11 @@ import MyModule from '../../../src/module';
 
 export default defineNuxtConfig({
   modules: [
-    MyModule,
+    // vložíme ho spolu s configom
+    [MyModule, {
+      apiKey: 'fake-key-for-test',
+      apiUrl: 'http://localhost',
+      debug: false,
+    }],
   ],
 });
