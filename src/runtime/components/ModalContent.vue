@@ -177,6 +177,8 @@ const handleSubmit = async () => {
       screenshot: props.capturedData?.screenshot,
       errors: props.capturedData?.errors,
       userAgent: props.capturedData?.userAgent,
+      viewport: props.capturedData?.viewport,
+      timestamp: props.capturedData?.timestamp,
     };
 
     const result = await createTicket(ticketPayload, user);

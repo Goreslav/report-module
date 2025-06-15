@@ -17,7 +17,11 @@ export interface TicketPayload {
   screenshot?: string | null;
   errors?: CapturedError[];
   userAgent?: string;
-  timestamp?: string;
+  viewport?: {
+    width: number;
+    height: number;
+  } | null;
+  timestamp?: number;
   source?: string;
 }
 
