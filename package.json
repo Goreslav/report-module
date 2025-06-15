@@ -1,6 +1,6 @@
 {
   "name": "@goreslav/report-module",
-  "version": "4.0.17",
+  "version": "4.0.18",
   "description": "A Nuxt 3 module for creating ticket reporting modals with API key authentication and user tracking",
   "repository": {
     "type": "git",
