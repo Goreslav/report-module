@@ -26,7 +26,8 @@ export default defineNuxtModule<ReportModuleOptions>({
 
     try {
       new URL(options.apiUrl);
-    } catch {
+    }
+    catch {
       throw new Error('[Report Module] apiUrl must be a valid URL');
     }
 
