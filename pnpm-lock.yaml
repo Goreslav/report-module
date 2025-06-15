@@ -11,6 +11,9 @@ importers:
       '@nuxt/kit':
         specifier: ^3.8.0
         version: 3.17.5(magicast@0.3.5)
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1

@@ -4,19 +4,11 @@ export interface User {
   level: string;
 }
 
-export interface Logger {
-  log(...args: any[]): void;
-  warn(...args: any[]): void;
-  error(...args: any[]): void;
-  debug(...args: any[]): void;
-}
-
 export interface ReportModuleOptions {
   apiKey: string;
   apiUrl: string;
   user?: User;
   debug?: boolean;
-  logger?: Logger;
 }
 
 export interface TicketPayload {

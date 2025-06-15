@@ -1,12 +1,11 @@
 import { ref } from 'vue';
 import html2canvas from 'html2canvas';
 import type { CapturedError, CapturedData } from '../types';
-import { useLogger } from './useLogger';
+import { moduleLogger } from '../utils/logger';
 
 const capturedErrors = ref<CapturedError[]>([]);
 
 export const useCaptureUtils = () => {
-  const { log, warn, error } = useLogger();
   const startErrorTracking = () => {
     if (typeof window === 'undefined') return;
     if (window._reportModuleErrorCaptureInitialized) return;
@@ -94,7 +93,7 @@ export const useCaptureUtils = () => {
       return dataURL;
 
     } catch (error) {
-      warn("html2canvas failed:", error);
+      moduleLogger.warn("html2canvas failed:", error);
       return null;
     }
   };
@@ -131,18 +130,18 @@ export const useCaptureUtils = () => {
     };
 
     try {
-        log('📸 Capturing screenshot...');
+      moduleLogger.log('📸 Capturing screenshot...');
       data.screenshot = await captureScreenshot();
 
       if (data.screenshot) {
-        log('✅ Screenshot captured successfully');
+        moduleLogger.log('✅ Screenshot captured successfully');
       }
       else {
-        warn('⚠️ Screenshot capture returned null');
+        moduleLogger.warn('⚠️ Screenshot capture returned null');
       }
     }
     catch (error) {
-      error('❌ Screenshot capture failed:', error);
+      moduleLogger.error('❌ Screenshot capture failed:', error);
       data.screenshot = null;
     }
 

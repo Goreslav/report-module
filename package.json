@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.0",
+    "consola": "^3.4.2",
     "html2canvas": "^1.4.1",
     "unbuild": "^2.0.0"
   },

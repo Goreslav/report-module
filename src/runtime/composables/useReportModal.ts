@@ -3,6 +3,8 @@ import ReportModal from '../components/ReportModal.vue';
 import type { User, CapturedData } from '../types';
 import { useCaptureUtils } from './useCaptureUtils';
 import { useRuntimeConfig } from '#app';
+import { moduleLogger } from '../utils/logger';
+
 
 const currentUser = ref<User | null>(null);
 
@@ -33,7 +35,7 @@ export const useReportModal = () => {
     };
 
     if (config.debug) {
-      console.log('👤 Report Module User set:', {
+      moduleLogger.log('👤 Report Module User set:', {
         name: user.name,
         ma: user.ma,
         level: user.level,
@@ -97,18 +99,18 @@ export const useReportModal = () => {
     const userToUse: User | null = currentUser.value;
 
     if (!userToUse) {
-      console.warn('⚠️ User not set. Call setUser() before opening modal.');
+      moduleLogger.warn('⚠️ User not set. Call setUser() before opening modal.');
       return;
     }
 
     if (!userToUse.name || !userToUse.ma || !userToUse.level) {
-      console.warn('⚠️ User data incomplete:', userToUse);
+      moduleLogger.warn('⚠️ User data incomplete:', userToUse);
       return;
     }
 
     if (config.debug) {
-      console.log('🚀 Opening Report Modal with user:', userToUse);
-      console.log('📊 Collecting captured data...');
+      moduleLogger.log('🚀 Opening Report Modal with user:', userToUse);
+      moduleLogger.log('📊 Collecting captured data...');
     }
 
     const { getCapturedData } = useCaptureUtils();
@@ -117,13 +119,13 @@ export const useReportModal = () => {
       const capturedData = await getCapturedData();
 
       if (config.debug) {
-        console.log('✅ Data capture completed:', capturedData);
+        moduleLogger.log('✅ Data capture completed:', capturedData);
       }
 
       createModalApp(capturedData, userToUse);
     }
     catch (error) {
-      console.warn('⚠️ Data capture failed, using fallback:', error);
+      moduleLogger.warn('⚠️ Data capture failed, using fallback:', error);
 
       const fallbackData = getFallbackCapturedData();
       createModalApp(fallbackData, userToUse);
@@ -133,7 +135,7 @@ export const useReportModal = () => {
   const clearUser = () => {
     currentUser.value = null;
     if (config.debug) {
-      console.log('👤 Report Module User cleared');
+      moduleLogger.log('👤 Report Module User cleared');
     }
   };
 

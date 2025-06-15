@@ -1,6 +1,6 @@
 import { $fetch } from 'ofetch';
 import type { ApiOptions } from '../types';
-import { useLogger } from './useLogger';
+import { moduleLogger } from '../utils/logger';
 import { useRuntimeConfig } from '#app';
 
 // interface ApiOptions {
@@ -15,10 +15,9 @@ export async function useApi<T>(
   options: ApiOptions = {},
 ): Promise<{ data: { value: T | null }; error: { value: Error | null } }> {
   const config = useRuntimeConfig().public.reportModule;
-  const { log, warn, error } = useLogger();
 
   if (config.debug) {
-    log('🔧 API Config:', {
+    moduleLogger.info('🔧 API Config:', {
       apiUrl: config.apiUrl,
       hasApiKey: !!config.apiKey,
       url: url,
@@ -37,7 +36,7 @@ export async function useApi<T>(
     }
 
     if (config.debug) {
-      log('🚀 API Call:', {
+      moduleLogger.log('🚀 API Call:', {
         url: fullUrl,
         method: options.method || 'GET',
         hasApiKey: !!config.apiKey,
@@ -61,7 +60,7 @@ export async function useApi<T>(
     });
 
     if (config.debug) {
-      log('✅ Report Module API Success:', result);
+      moduleLogger.log('✅ Report Module API Success:', result);
     }
 
     return {

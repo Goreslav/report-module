@@ -96,6 +96,7 @@
 import { ref, computed } from 'vue';
 import { useTicketApi } from '../composables/useTicketApi';
 import { useRuntimeConfig } from '#app';
+import { moduleLogger } from '../utils/logger';  // ✅ Import loggera
 
 const props = defineProps({
   user: {
@@ -163,7 +164,7 @@ const handleSubmit = async () => {
     const user = props.user;
 
     if (config.debug) {
-      console.log('🎫 Submitting ticket with data:', {
+      moduleLogger.info('🎫 Submitting ticket with data:', {
         user,
         text: formData.value.text,
         capturedData: props.capturedData,
@@ -181,6 +182,7 @@ const handleSubmit = async () => {
     const result = await createTicket(ticketPayload, user);
 
     if (result.success) {
+      moduleLogger.success('✅ Ticket created successfully');
       emit('close');
     }
     else {
@@ -189,8 +191,14 @@ const handleSubmit = async () => {
   }
   catch (error) {
     const errorMessage = 'Nastala chyba pri odosielaní.';
+
+    moduleLogger.error('❌ Ticket submission failed:', {
+      error: error.message,
+      user: props.user,
+      textLength: formData.value.text.length
+    });
+
     if (config.debug) {
-      console.log(error);
       alert(errorMessage);
     }
   }
