@@ -76,16 +76,57 @@ export const useCaptureUtils = () => {
     if (typeof window === 'undefined') return null;
 
     try {
-      const canvas = await html2canvas(document.body, {
-        allowTaint: true,
-        useCORS: true,
-        scale: 0.9,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        foreignObjectRendering: true,
+      // ✅ KRITICKÉ: Počkajte na načítanie všetkého
+      await document.fonts.ready;
+
+      // Počkajte na SVG a obrázky
+      await new Promise((resolve) => {
+        if (document.readyState === 'complete') {
+          resolve(true);
+        }
+        else {
+          window.addEventListener('load', resolve);
+        }
       });
 
-      const dataURL = canvas.toDataURL('image/png', 0.9);
+      const canvas = await html2canvas(document.body, {
+        scale: 0.9,
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        useCORS: true,
+
+        // ✅ KĽÚČOVÉ pre SVG ikony a ilustrácie
+        foreignObjectRendering: true,
+        svg: true,
+        letterRendering: true,
+
+        // ✅ Dlhší timeout pre načítanie obrázkov
+        imageTimeout: 30000,
+        removeContainer: true,
+
+        // ✅ Callback pre úpravu klonovaného DOM
+        onclone: (clonedDoc) => {
+          // Force načítanie všetkých SVG a fontov
+          const svgs = clonedDoc.querySelectorAll('svg');
+          svgs.forEach((svg) => {
+            svg.style.display = 'inline-block';
+          });
+
+          // Zabezpečte že fonty sú načítané
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+          * {
+            font-display: block !important;
+            -webkit-font-smoothing: antialiased;
+          }
+        `;
+          clonedDoc.head.appendChild(style);
+
+          return clonedDoc;
+        },
+      });
+
+      const dataURL = canvas.toDataURL('image/png', 1.0);
       return dataURL;
     }
     catch (error) {
