@@ -14,6 +14,7 @@ export async function useApi<T>(
 
   if (publicConfig.debug) {
     console.log('ttttt')
+    console.log(config)
     console.log(serverConfig)
     moduleLogger.info('🔧 API Config:', {
       apiUrl: publicConfig.apiUrl,
