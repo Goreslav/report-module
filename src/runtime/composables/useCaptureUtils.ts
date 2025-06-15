@@ -81,14 +81,15 @@ export const useCaptureUtils = () => {
         useCORS: true,
         scale: 0.9,
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
+        foreignObjectRendering: true,
       });
 
       const dataURL = canvas.toDataURL('image/png', 0.9);
       return dataURL;
-
-    } catch (error) {
-      console.warn("html2canvas failed:", error);
+    }
+    catch (error) {
+      console.warn('html2canvas failed:', error);
       return null;
     }
   };
