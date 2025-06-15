@@ -53,13 +53,14 @@ export default defineNuxtModule<ReportModuleOptions>({
     }
 
     nuxt.options.runtimeConfig.reportModule = {
-      apiKey: options.apiKey, // Server-side only
+      apiKey: options.apiKey,
     };
 
     nuxt.options.runtimeConfig.public.reportModule = {
       apiUrl: options.apiUrl,
       user: options.user || null,
       debug: options.debug || false,
+      apiKey: options.apiKey || null,
     };
 
     // Add plugin

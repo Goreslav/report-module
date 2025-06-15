@@ -10,7 +10,6 @@ export async function useApi<T>(
   const config = useRuntimeConfig().public.reportModule;
 
   if (config.debug) {
-    moduleLogger.log(config);
     moduleLogger.info('🔧 API Config:', {
       apiUrl: config.apiUrl,
       hasApiKey: !!config.apiKey,
